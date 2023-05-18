@@ -3,6 +3,7 @@ import time
 import pandas as pd
 import numpy as np
 
+from pandas import DataFrame
 from mytools.tool_class import NamesPhone
 
 def get_files_names() -> list:
@@ -18,17 +19,16 @@ def get_files_names() -> list:
     except Exception as ex:
         print(f"Ошибка! {ex}")
 
-def load_dataframe():
+def load_dataframe(filename: str=None) -> DataFrame:
     try:
-        phones_names = NamesPhone()
-        namefile = "Excel_Files/0.xlsx"
-        df_full = pd.read_excel(
-                namefile)
-        print(df_full.columns.tolist())
+        change_series = NamesPhone()
+        filename = f"Excel_Files/{filename}"
+        df_source = pd.read_excel(filename)
 
-        df_full = df_full[[
+        df_source = df_source[[
             "Артикул поставщика",
             "Название",
+            # "Дата продажи",
             "Обоснование для оплаты",
             "Кол-во",
             "Цена розничная с учетом согласованной скидки",
@@ -36,17 +36,60 @@ def load_dataframe():
             "Услуги по доставке товара покупателю",
             "Общая сумма штрафов"
         ]]
-        df_full.insert(loc=1, column="Телефон", value="")
-        df_full["Телефон"] = phones_names.get_names(df_full["Артикул поставщика"].str[:6:])
-        print(df_full.columns.tolist())
-        print(df_full[["Телефон", "Артикул поставщика", "Название"]].head(30))
+
+        df_source.insert(loc=1, column="Телефон", value="")
+        df_source["Телефон"] = change_series.get_names_phone(df_source["Артикул поставщика"].str[:6:])
+        df_source["Название"] = change_series.get_name_print(df_source["Название"])
+
+        df_source = df_source.rename(columns={
+            "Артикул поставщика": "артикул",
+            # "Дата продажи": "дата",
+            "Обоснование для оплаты": "обоснование",
+            "Цена розничная с учетом согласованной скидки": "цена со скидкой",
+            "К перечислению Продавцу за реализованный Товар": "к перечислению",
+            "Услуги по доставке товара покупателю": "доставка",
+            "Общая сумма штрафов": "штрафы"
+        })
+        print(df_source[["Телефон", "Название"]].tail(30))
+
+        return df_source
 
     except Exception as ex:
         print(f"Ошибка! {ex}")
 
+def merge_data(list_file_xlsx: list=None) -> None:
+    try:
+        df_full = DataFrame()
+
+        for file in list_file_xlsx:
+            df_full = pd.concat([df_full, load_dataframe(file)], ignore_index=True)
+
+        df_full = df_full[df_full["обоснование"]=="Возврат"]
+        df_result = df_full.groupby(  # группировка DataFrame по 3-м параметрам (столбикам)
+            ['артикул', 'Телефон', 'Название', "обоснование"],
+            as_index=False
+        ).aggregate(  # агрегирование столбца Количество
+            {
+                'Кол-во': "sum",
+                'цена со скидкой': "sum",
+                'к перечислению': "sum",
+                'доставка': "sum",
+                'штрафы': "sum"
+            }
+        )
+
+        print(df_result.columns.tolist())
+        print(df_result.tail())
+
+        df_result.to_excel("RESULT_возврат.xlsx", sheet_name="ИТОГ")
+
+    except Exception as ex:
+        print(f"Ошибка! {ex}")
+
+
 def main():
-    # list_file_xlsx = get_files_names()
-    load_dataframe()
+    list_file_xlsx = get_files_names()
+    merge_data(list_file_xlsx)
 
 
 if __name__ == '__main__':

@@ -76,9 +76,33 @@ class NamesPhone:
     def __rename_folder(self, old_name: str, new_name: str) -> None:
         os.rename(old_name, new_name)
 
-    def get_names(self, series: Series) -> str:
-        result = Series(self.__phonename[item] for item in series)
+    def get_names_phone(self, series: Series) -> Series:
+        """
+        Получает pandas Series из кодов телефонов, и возвращает Series из названий телефонов
+        :param series:
+        :return:
+        """
+        try:
+            result = Series(self.__phonename[item] for item in series)
+            return result
+        except Exception as ex:
+            print(f"Ошибка! {ex}")
+
+    def get_name_print(self, series: Series) -> Series:
+        result = Series(self.__split_text(item) for item in series)
         return result
+
+    @staticmethod
+    def __split_text(string: str):
+        try:
+            if " с принтом " in string:
+                return string.split(" с принтом ")[1]
+            elif " принт " in string:
+                return string.split(" принт ")[1]
+            else:
+                return string
+        except Exception as ex:
+            print(f"Ошибка! {ex}")
 
     @property
     def get_code_name(self) -> str:
