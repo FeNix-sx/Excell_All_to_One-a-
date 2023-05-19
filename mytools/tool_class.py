@@ -61,7 +61,6 @@ class NamesPhone:
     def __chek_folder_name(self) -> dict:
         try:
             names_codes_dict: dict = CodeNamePhone("models.csv").get_names_code
-            print(names_codes_dict)
             return names_codes_dict
 
         except ValueError:
