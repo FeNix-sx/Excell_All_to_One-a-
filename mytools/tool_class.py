@@ -1,7 +1,5 @@
 import csv
 import os
-import shutil
-import re
 import time
 from datetime import datetime
 
