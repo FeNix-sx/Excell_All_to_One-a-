@@ -49,7 +49,7 @@ def load_dataframe(filename: str=None) -> DataFrame:
         ]]
 
         df_source.insert(loc=1, column="Телефон", value="")
-        df_source["Телефон"] = change_series.get_names_phone(df_source["Артикул поставщика"].str[:6:])
+        df_source["телефон"] = change_series.get_names_phone(df_source["Артикул поставщика"].str[:6:])
         df_source["Название"] = change_series.get_name_print(df_source["Название"])
 
         df_source = df_source.rename(columns={
@@ -76,12 +76,13 @@ def merge_data(list_file_xlsx: list=None) -> None:
 
         for file in list_file_xlsx:
             df_full = pd.concat([df_full, load_dataframe(file)], ignore_index=True)
-            printinf(f"Файл {file} загружен")
+            printinf(f"файл {file} загружен")
+        print()
 
         data_begin = df_full["дата"].min()
         data_end = df_full["дата"].max()
 
-        printw(f"Задайте интересующий временной интервал",
+        printw(f"Задайте интересующий временной интервал для выборки данных",
                f"нижняя граница: {data_begin.strftime('%d.%m.%Y')}",
                f"верхняя граница: {data_end.strftime('%d.%m.%Y')}",
                sep="\n")
@@ -91,9 +92,7 @@ def merge_data(list_file_xlsx: list=None) -> None:
 
         inp_begin = datetime.strptime(inputdata(" c ->: "), '%d.%m.%Y')
         inp_end = datetime.strptime(inputdata("по ->: "), '%d.%m.%Y')
-
-        # data_begin = datetime.strptime("01.04.2023", '%d.%m.%Y')
-        # data_end = datetime.strptime("23.04.2023", '%d.%m.%Y')
+        print()
 
         printinf(f"Выбран диапазон дат: {data_begin.strftime('%d.%m.%Y')} - {data_end.strftime('%d.%m.%Y')}")
 
@@ -102,23 +101,24 @@ def merge_data(list_file_xlsx: list=None) -> None:
             (df_full["дата"] >= inp_begin)&
             (df_full["дата"] <= inp_end)
         ]
+        print()
 
         printw(f"Выбирете один из показателей для расчетов:",
-               f"1 - артикул, 2 - название телефона, 3 - Название принта",
+               f"1 - артикул, 2 - название телефона, 3 - название принта",
                sep="\n")
         index = inputindex("--->: ")
 
         GROUP_LIST = [
                 'артикул',
-                'Телефон',
+                'телефон',
                 'Название',
                 "обоснование"
             ][index-1:index]
 
-        df_result = df_full.groupby(  # группировка DataFrame по 3-м параметрам (столбикам)
+        df_result = df_full.groupby(  # группировка DataFrame по парамету списка GROUP_LIST
             GROUP_LIST,
             as_index=False
-        ).aggregate(  # агрегирование столбца Количество
+        ).aggregate(  # агрегирование столбцов
             {
                 'Кол-во': "sum",
                 'к перечислению': "sum",
@@ -140,7 +140,8 @@ def merge_data(list_file_xlsx: list=None) -> None:
             index_label="№ п/п",
             startrow=1
         )
-        printw(f"файл {result_file_name} создан.")
+        print()
+        printinf(f"файл {result_file_name} создан.")
         printinf("Программа успешно завершена")
         time.sleep(3)
 
@@ -149,8 +150,9 @@ def merge_data(list_file_xlsx: list=None) -> None:
 
 
 def main():
+    printw("Программа собирает информацию из ВСЕХ *.xlsx файлов,\nнаходящихся в папке 'Excel_Files'")
+    time.sleep(2)
     list_file_xlsx = get_files_names()
-    print()
     merge_data(list_file_xlsx)
 
 
