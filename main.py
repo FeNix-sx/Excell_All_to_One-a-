@@ -38,7 +38,7 @@ def load_dataframe(filename: str=None) -> DataFrame:
 
         df_source = df_source[[
             "Артикул поставщика",
-            "Название",
+            "название",
             "Дата продажи",
             "Обоснование для оплаты",
             "Кол-во",
@@ -94,7 +94,7 @@ def merge_data(list_file_xlsx: list=None) -> None:
         inp_end = datetime.strptime(inputdata("по ->: "), '%d.%m.%Y')
         print()
 
-        printinf(f"Выбран диапазон дат: {data_begin.strftime('%d.%m.%Y')} - {data_end.strftime('%d.%m.%Y')}")
+        printinf(f"Выбран диапазон дат: {inp_begin.strftime('%d.%m.%Y')} - {inp_end.strftime('%d.%m.%Y')}")
 
         df_full = df_full[
             (df_full["обоснование"].isin(FILTER_RES))&
@@ -111,7 +111,7 @@ def merge_data(list_file_xlsx: list=None) -> None:
         GROUP_LIST = [
                 'артикул',
                 'телефон',
-                'Название',
+                'название',
                 "обоснование"
             ][index-1:index]
 
@@ -127,6 +127,16 @@ def merge_data(list_file_xlsx: list=None) -> None:
                 'штрафы': "sum"
             }
         )
+        # добавляем пустую строку в конец таблицы
+        # df_result.loc[len(df_result.index)] = ["", 0, 0, 0, 0, 0]
+        df_result.loc[len(df_result.index)] = [
+            '### И Т О Г О ###',
+            df_result['Кол-во'].astype(float).sum(),
+            df_result['к перечислению'].astype(float).sum(),
+            df_result['налог'].astype(float).sum(),
+            df_result['доставка'].astype(float).sum(),
+            df_result['штрафы'].astype(float).sum()
+        ]
 
         begin = f"{inp_begin.strftime('%d%m%Y')}"
         end = f"{inp_end.strftime('%d%m%Y')}"
