@@ -5,6 +5,7 @@ import numpy as np
 
 from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from datetime import datetime
 from pandas import DataFrame
 from mytools.tool_class import NamesPhone, ColorInput, ColorPrint
@@ -35,6 +36,7 @@ def get_files_names() -> list:
 
     except Exception as ex:
         print(f"Ошибка! {ex}")
+
 
 def load_dataframe(filename: str=None) -> DataFrame:
     try:
@@ -77,6 +79,7 @@ def load_dataframe(filename: str=None) -> DataFrame:
     except Exception as ex:
         print(f"Ошибка! {ex}")
 
+
 def merge_data(list_file_xlsx: list=None) -> None:
     try:
         df_full = DataFrame()
@@ -118,51 +121,83 @@ def merge_data(list_file_xlsx: list=None) -> None:
         result_file_name = f"RESULT.xlsx"
 
         # создаем файл result_file_name
-        with pd.ExcelWriter(result_file_name, engine='xlsxwriter') as writer:
-            for group in GROUP_LIST:
-                df_result = df_full.groupby(  # группировка DataFrame по параметру списка group
-                    [group],
-                    as_index=False
-                ).aggregate(  # агрегирование столбцов
-                    {
-                        'Кол-во': "sum",
-                        'к перечислению': "sum",
-                        'налог': "sum",
-                        'доставка': "sum",
-                        'штрафы': "sum"
-                    }
-                )
-                # добавляем строку в конец таблицы
-                df_result.loc[len(df_result.index)] = [
-                    '### И Т О Г О ###',
-                    df_result['Кол-во'].astype(float).sum(),
-                    df_result['к перечислению'].astype(float).sum(),
-                    df_result['налог'].astype(float).sum(),
-                    df_result['доставка'].astype(float).sum(),
-                    df_result['штрафы'].astype(float).sum()
-                ]
-                # создаем лист group в файле result_file_name и записываем туда df_result
-                df_result.to_excel(
-                    writer,
-                    sheet_name=f"{group}",
-                    index=True,
-                    index_label="№ п/п",
-                    startrow=1
-                )
+        # with pd.ExcelWriter(result_file_name, engine='xlsxwriter') as writer:
+        #     for group in GROUP_LIST:
+        #         df_result = df_full.groupby(  # группировка DataFrame по параметру списка group
+        #             [group],
+        #             as_index=False
+        #         ).aggregate(  # агрегирование столбцов
+        #             {
+        #                 'Кол-во': "sum",
+        #                 'к перечислению': "sum",
+        #                 'налог': "sum",
+        #                 'доставка': "sum",
+        #                 'штрафы': "sum"
+        #             }
+        #         )
+        #         # добавляем строку в конец таблицы
+        #         df_result.loc[len(df_result.index)] = [
+        #             '### И Т О Г О ###',
+        #             df_result['Кол-во'].astype(float).sum(),
+        #             df_result['к перечислению'].astype(float).sum(),
+        #             df_result['налог'].astype(float).sum(),
+        #             df_result['доставка'].astype(float).sum(),
+        #             df_result['штрафы'].astype(float).sum()
+        #         ]
+        #
+        #         # создаем лист group в файле result_file_name и записываем туда df_result
+        #         df_result.to_excel(
+        #             writer,
+        #             sheet_name=f"{group}",
+        #             index=True,
+        #             index_label="№ п/п",
+        #             startrow=1
+        #         )
+        #
+        #         # получаем объект workbook и worksheet нужного листа
+        #         workbook = writer.book
+        #         worksheet = writer.sheets[f"{group}"]
+        #
+        #         for i, col in enumerate(df_result):
+        #             max_width = max(df_result[col].astype(str).map(len).max(), len(col))
+        #             worksheet.set_column(i+1, i+1, max_width + 1)
+        #
+        #         last_row = len(df_result) + 1
+        #         bold_format = workbook.add_format({'bold': True})
+        #         worksheet.set_row(last_row, None, bold_format)
+        #
+        #         del df_result
 
-                # получаем объект workbook и worksheet нужного листа
-                workbook = writer.book
-                worksheet = writer.sheets[f"{group}"]
+        # создаем объект Excel
+        new_wb = Workbook()
 
-                for i, col in enumerate(df_result):
-                    max_width = max(df_result[col].astype(str).map(len).max(), len(col))
-                    worksheet.set_column(i+1, i+1, max_width + 1)
+        for group in GROUP_LIST:
+            df_result = df_full.groupby(  # группировка DataFrame по параметру списка group
+                [group],
+                as_index=False
+            ).aggregate(  # агрегирование столбцов
+                {
+                    'Кол-во': "sum",
+                    'к перечислению': "sum",
+                    'налог': "sum",
+                    'доставка': "sum",
+                    'штрафы': "sum"
+                }
+            )
+            # добавляем строку в конец таблицы
+            df_result.loc[len(df_result.index)] = [
+                '### И Т О Г О ###',
+                df_result['Кол-во'].astype(float).sum(),
+                df_result['к перечислению'].astype(float).sum(),
+                df_result['налог'].astype(float).sum(),
+                df_result['доставка'].astype(float).sum(),
+                df_result['штрафы'].astype(float).sum()
+            ]
+            worksheet = new_wb.create_sheet(title=group)
+            create_excel_tables(worksheet, df=df_result)
 
-                last_row = len(df_result) + 1
-                bold_format = workbook.add_format({'bold': True})
-                worksheet.set_row(last_row, None, bold_format)
-
-                del df_result
+        # сохраняем файл
+        new_wb.save(result_file_name)
 
         printinf(f"Файл {result_file_name} создан.")
         printinf("Программа успешно завершена")
@@ -171,13 +206,32 @@ def merge_data(list_file_xlsx: list=None) -> None:
     except Exception as ex:
         print(f"Ошибка! {ex}")
 
-def create_excel_tables(df: DataFrame=None, wb: Workbook=None):
+
+def create_excel_tables(worksheet, df: DataFrame=None):
     # создаем лист и заголовки
-    worksheet = wb.create_sheet(title='shit1')
     headers = df.columns.values.tolist()
     worksheet.append(headers)
-    pass
 
+    # добавляем данные из датафреймов на лист и применяем стили
+    for data in dataframe_to_rows(df, index=False, header=False):
+        worksheet.append(data)
+        # добавляем стили
+        for cell in worksheet['A']:
+            cell.font = Font(bold=True, color='FFFFFF')
+            cell.fill = PatternFill(
+                fill_type='solid',
+                start_color='FF0000',
+                end_color='FF0000'
+            )
+            cell.alignment = Alignment(horizontal='center')
+            cell.border = Border(
+                left=Side(style='medium'),
+                right=Side(style='medium'),
+                top=Side(style='medium'),
+                bottom=Side(style='medium')
+            )
+
+    worksheet.auto_filter.ref = worksheet.dimensions
 
 
 def main():
