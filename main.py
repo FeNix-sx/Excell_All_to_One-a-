@@ -25,8 +25,21 @@ def get_files_names() -> list:
     Получение списка файлов из папки Excel_Files
     :return: list
     """
+
     try:
         folder_path = 'Excel_Files'
+        while True:
+            if os.path.exists(folder_path) and os.path.isdir(folder_path):
+                break
+            else:
+                printer("Папка Excel_Files не существует")
+                printinf("Создайте Excel_Files, поместите в нее файлы *.xlsx")
+
+                if input("Перезапустить программу?(y/n): ") in ("y", "да"):
+                    continue
+                else:
+                    return None
+
         file_list = os.listdir(folder_path)
         xlsx_files = [file for file in file_list if file.endswith('.xlsx')]
 
@@ -198,6 +211,11 @@ def main():
     printw("Программа собирает информацию из ВСЕХ *.xlsx файлов,\nнаходящихся в папке 'Excel_Files'")
     time.sleep(2)
     list_file_xlsx = get_files_names()
+    if not list_file_xlsx:
+        printer("Файлы не найдены. Программа завершена")
+        time.sleep(3)
+        return
+
     df = merge_data(list_file_xlsx)
     write_to_excel(df)
 
