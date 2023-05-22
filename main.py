@@ -3,16 +3,22 @@ import time
 import pandas as pd
 import numpy as np
 
+from openpyxl import Workbook
+from openpyxl.utils.dataframe import dataframe_to_rows
 from datetime import datetime
 from pandas import DataFrame
 from mytools.tool_class import NamesPhone, ColorInput, ColorPrint
 
-change_series = NamesPhone()
+
+
 printer = ColorPrint().print_error
 printinf = ColorPrint().print_info
 printw = ColorPrint().print_warning
+printw("version 1.1")
 
+change_series = NamesPhone()
 FILTER_RES = ["Продажа", "Логистика", "Возврат"]
+
 
 def get_files_names() -> list:
     """
@@ -38,7 +44,7 @@ def load_dataframe(filename: str=None) -> DataFrame:
 
         df_source = df_source[[
             "Артикул поставщика",
-            "название",
+            "Название",
             "Дата продажи",
             "Обоснование для оплаты",
             "Кол-во",
@@ -55,6 +61,7 @@ def load_dataframe(filename: str=None) -> DataFrame:
         df_source = df_source.rename(columns={
             "Артикул поставщика": "артикул",
             "Дата продажи": "дата",
+            "Название": "название",
             "Обоснование для оплаты": "обоснование",
             "Цена розничная с учетом согласованной скидки": "налог",
             "К перечислению Продавцу за реализованный Товар": "к перечислению",
@@ -88,7 +95,6 @@ def merge_data(list_file_xlsx: list=None) -> None:
                sep="\n")
 
         inputdata = ColorInput([data_begin, data_end]).cinput_date
-        inputindex = ColorInput([1, 3]).cinput_int
 
         inp_begin = datetime.strptime(inputdata(" c ->: "), '%d.%m.%Y')
         inp_end = datetime.strptime(inputdata("по ->: "), '%d.%m.%Y')
@@ -101,62 +107,77 @@ def merge_data(list_file_xlsx: list=None) -> None:
             (df_full["дата"] >= inp_begin)&
             (df_full["дата"] <= inp_end)
         ]
-        print()
-
-        printw(f"Выбирете один из показателей для расчетов:",
-               f"1 - артикул, 2 - название телефона, 3 - название принта",
-               sep="\n")
-        index = inputindex("--->: ")
 
         GROUP_LIST = [
                 'артикул',
                 'телефон',
-                'название',
-                "обоснование"
-            ][index-1:index]
+                'название'
+                # "обоснование"
+            ]
 
-        df_result = df_full.groupby(  # группировка DataFrame по парамету списка GROUP_LIST
-            GROUP_LIST,
-            as_index=False
-        ).aggregate(  # агрегирование столбцов
-            {
-                'Кол-во': "sum",
-                'к перечислению': "sum",
-                'налог': "sum",
-                'доставка': "sum",
-                'штрафы': "sum"
-            }
-        )
-        # добавляем пустую строку в конец таблицы
-        # df_result.loc[len(df_result.index)] = ["", 0, 0, 0, 0, 0]
-        df_result.loc[len(df_result.index)] = [
-            '### И Т О Г О ###',
-            df_result['Кол-во'].astype(float).sum(),
-            df_result['к перечислению'].astype(float).sum(),
-            df_result['налог'].astype(float).sum(),
-            df_result['доставка'].astype(float).sum(),
-            df_result['штрафы'].astype(float).sum()
-        ]
+        result_file_name = f"RESULT.xlsx"
 
-        begin = f"{inp_begin.strftime('%d%m%Y')}"
-        end = f"{inp_end.strftime('%d%m%Y')}"
+        # создаем файл result_file_name
+        with pd.ExcelWriter(result_file_name, engine='xlsxwriter') as writer:
+            for group in GROUP_LIST:
+                df_result = df_full.groupby(  # группировка DataFrame по параметру списка group
+                    [group],
+                    as_index=False
+                ).aggregate(  # агрегирование столбцов
+                    {
+                        'Кол-во': "sum",
+                        'к перечислению': "sum",
+                        'налог': "sum",
+                        'доставка': "sum",
+                        'штрафы': "sum"
+                    }
+                )
+                # добавляем строку в конец таблицы
+                df_result.loc[len(df_result.index)] = [
+                    '### И Т О Г О ###',
+                    df_result['Кол-во'].astype(float).sum(),
+                    df_result['к перечислению'].astype(float).sum(),
+                    df_result['налог'].astype(float).sum(),
+                    df_result['доставка'].astype(float).sum(),
+                    df_result['штрафы'].astype(float).sum()
+                ]
+                # создаем лист group в файле result_file_name и записываем туда df_result
+                df_result.to_excel(
+                    writer,
+                    sheet_name=f"{group}",
+                    index=True,
+                    index_label="№ п/п",
+                    startrow=1
+                )
 
-        filter_name = "_".join(GROUP_LIST)
-        result_file_name = f"RESULT_{filter_name}.xlsx"
-        df_result.to_excel(
-            result_file_name,
-            sheet_name=f"{begin}-{end}",
-            index=True,
-            index_label="№ п/п",
-            startrow=1
-        )
-        print()
-        printinf(f"файл {result_file_name} создан.")
+                # получаем объект workbook и worksheet нужного листа
+                workbook = writer.book
+                worksheet = writer.sheets[f"{group}"]
+
+                for i, col in enumerate(df_result):
+                    max_width = max(df_result[col].astype(str).map(len).max(), len(col))
+                    worksheet.set_column(i+1, i+1, max_width + 1)
+
+                last_row = len(df_result) + 1
+                bold_format = workbook.add_format({'bold': True})
+                worksheet.set_row(last_row, None, bold_format)
+
+                del df_result
+
+        printinf(f"Файл {result_file_name} создан.")
         printinf("Программа успешно завершена")
         time.sleep(3)
 
     except Exception as ex:
         print(f"Ошибка! {ex}")
+
+def create_excel_tables(df: DataFrame=None, wb: Workbook=None):
+    # создаем лист и заголовки
+    worksheet = wb.create_sheet(title='shit1')
+    headers = df.columns.values.tolist()
+    worksheet.append(headers)
+    pass
+
 
 
 def main():

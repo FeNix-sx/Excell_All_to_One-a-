@@ -159,6 +159,3 @@ class NamesPhone:
     @property
     def get_code_name(self) -> str:
         return self.__phonename
-
-
-
