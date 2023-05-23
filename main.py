@@ -69,18 +69,18 @@ def load_dataframe(filename: str=None) -> DataFrame:
 
         df_source.insert(loc=1, column="Телефон", value="")
         df_source["телефон"] = change_series.get_names_phone(df_source["Артикул поставщика"].str[:6:])
-        df_source["Название"] = change_series.get_name_print(df_source["Название"])
+        df_source["Название"] = df_source["Артикул поставщика"].str[-3:]
         df_source["код телефона"] = df_source["Артикул поставщика"].str[:6]
 
         df_source = df_source.rename(columns={
             "Артикул поставщика": "артикул",
             "Дата продажи": "дата",
-            "Название": "название",
+            "Название": "код принта",
             "Обоснование для оплаты": "обоснование",
             "Цена розничная с учетом согласованной скидки": "налог",
             "К перечислению Продавцу за реализованный Товар": "к перечислению",
-            "Услуги по доставке товара покупателю": "доставка",
-            "Общая сумма штрафов": "штрафы",
+            "Услуги по доставке товара покупателю": "логистика_затраты",
+            "Общая сумма штрафов": "штрафы_затраты",
             "код телефона": "код"
         })
 
@@ -117,12 +117,32 @@ def merge_data(list_file_xlsx: list=None) -> None:
         print()
 
         printinf(f"Выбран диапазон дат: {inp_begin.strftime('%d.%m.%Y')} - {inp_end.strftime('%d.%m.%Y')}")
+        # заменяем текстовое поле обоснование на поля с int
+        df_dummies = pd.get_dummies(df_full["обоснование"], dtype=int)
+
+        df_full = pd.concat([df_full, df_dummies], axis=1)
+        del df_dummies
+
+        # налог и прибыль не учитывается когда был возврат
+        df_full.loc[df_full['Возврат'] == 1, 'налог'] *= -1
+        df_full.loc[df_full['Возврат'] == 1, 'к перечислению'] *= -1
 
         df_full = df_full[
-            (df_full["обоснование"].isin(FILTER_RES))&
             (df_full["дата"] >= inp_begin)&
             (df_full["дата"] <= inp_end)
         ]
+        # удалаем поле ["дата", "обоснование"]
+        df_full.drop(["дата", "обоснование", "Телефон"], axis=1, inplace=True)
+        # создаем поле с чистой прибылью
+        df_full.insert(
+            loc=3,
+            column="чистая прибыль",
+            value=df_full["к перечислению"] -
+                  df_full["налог"] -
+                  df_full["логистика_затраты"] -
+                  df_full["штрафы_затраты"] -
+                  df_full["Продажа"] * 157
+        )
         return df_full
 
     except Exception as ex:
@@ -134,7 +154,7 @@ def write_to_excel(df_full: DataFrame=None) -> None:
         GROUP_LIST = [
                 'артикул',
                 'телефон',
-                'название',
+                'код принта',
                 'код'
             ]
 
@@ -143,26 +163,26 @@ def write_to_excel(df_full: DataFrame=None) -> None:
         # создаем файл result_file_name
         with pd.ExcelWriter(result_file_name, engine='xlsxwriter') as writer:
             for group in GROUP_LIST:
+                # задаем список полей для агрегации
+                agg_list = [item for item in df_full.columns if item not in GROUP_LIST]
+                agg_dict = {item:"sum" for item in agg_list}
                 df_result = df_full.groupby(  # группировка DataFrame по параметру списка group
                     [group],
                     as_index=False
                 ).aggregate(  # агрегирование столбцов
-                    {
-                        'Кол-во': "sum",
-                        'к перечислению': "sum",
-                        'налог': "sum",
-                        'доставка': "sum",
-                        'штрафы': "sum"
-                    }
+                    agg_dict
                 )
+                # сортировка
+                df_result = df_result.sort_values('Кол-во', ascending=False)
+
+                # создаем список столбцов для агрегации (суммирования в данном случае)
+                colum_list = [
+                    df_result[item].astype(float).sum() for item in agg_list
+                ]
                 # добавляем строку в конец таблицы
                 df_result.loc[len(df_result.index)] = [
                     '### И Т О Г О ###',
-                    df_result['Кол-во'].astype(float).sum(),
-                    df_result['к перечислению'].astype(float).sum(),
-                    df_result['налог'].astype(float).sum(),
-                    df_result['доставка'].astype(float).sum(),
-                    df_result['штрафы'].astype(float).sum()
+                    *colum_list
                 ]
                 df_result.insert(loc=0, column='№ п/п', value=range(1, len(df_result) + 1))
                 # создаем лист group в файле result_file_name и записываем туда df_result
