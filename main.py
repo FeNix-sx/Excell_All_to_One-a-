@@ -1,10 +1,7 @@
 import os
 import time
 import pandas as pd
-import numpy as np
 
-from openpyxl import Workbook
-from openpyxl.utils.dataframe import dataframe_to_rows
 from datetime import datetime
 from pandas import DataFrame
 from mytools.tool_class import NamesPhone, ColorInput, ColorPrint
@@ -59,9 +56,9 @@ def load_dataframe(filename: str=None) -> DataFrame:
             "Артикул поставщика",
             "Название",
             "Дата продажи",
+            "Вайлдберриз реализовал Товар (Пр)",
             "Обоснование для оплаты",
             "Кол-во",
-            "Цена розничная с учетом согласованной скидки",
             "К перечислению Продавцу за реализованный Товар",
             "Услуги по доставке товара покупателю",
             "Общая сумма штрафов"
@@ -77,7 +74,7 @@ def load_dataframe(filename: str=None) -> DataFrame:
             "Дата продажи": "дата",
             "Название": "код принта",
             "Обоснование для оплаты": "обоснование",
-            "Цена розничная с учетом согласованной скидки": "налог",
+            "Вайлдберриз реализовал Товар (Пр)": "налог",
             "К перечислению Продавцу за реализованный Товар": "к перечислению",
             "Услуги по доставке товара покупателю": "логистика_затраты",
             "Общая сумма штрафов": "штрафы_затраты",
@@ -124,8 +121,8 @@ def merge_data(list_file_xlsx: list=None) -> None:
         del df_dummies
 
         # налог и прибыль не учитывается когда был возврат
-        df_full.loc[df_full['Возврат'] == 1, 'налог'] *= -1
-        df_full.loc[df_full['Возврат'] == 1, 'к перечислению'] *= -1
+        df_full.loc[df_full['Возврат'] == 1, 'налог'] *= 0
+        df_full.loc[df_full['Возврат'] == 1, 'к перечислению'] *= 0
 
         df_full = df_full[
             (df_full["дата"] >= inp_begin)&
@@ -141,8 +138,16 @@ def merge_data(list_file_xlsx: list=None) -> None:
                   df_full["налог"] -
                   df_full["логистика_затраты"] -
                   df_full["штрафы_затраты"] -
-                  df_full["Продажа"] * 157
+                  df_full["Логистика"] * 157
         )
+        # меняем местами столбцы
+        df_full = df_full[
+            [
+                'артикул', 'код принта', 'Кол-во', 'чистая прибыль', 'к перечислению',
+                'налог', 'логистика_затраты', 'штрафы_затраты', 'телефон',
+                'код', 'Возврат', 'Логистика', 'Продажа', 'Штрафы'
+            ]
+        ]
         return df_full
 
     except Exception as ex:
@@ -159,7 +164,6 @@ def write_to_excel(df_full: DataFrame=None) -> None:
             ]
 
         result_file_name = f"RESULT.xlsx"
-
         # создаем файл result_file_name
         with pd.ExcelWriter(result_file_name, engine='xlsxwriter') as writer:
             for group in GROUP_LIST:
