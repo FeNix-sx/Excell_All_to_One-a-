@@ -9,7 +9,9 @@ init(autoreset=True)
 
 class ColorInput:
     def __init__(self, patern: list=None) -> None:
-        self.__patern = self.__check_value(patern)
+        self.__patern = [
+            item.strftime('%d.%m.%Y') for item in self.__check_value(patern)
+        ]
 
     @staticmethod
     def __check_value(patern):
@@ -22,8 +24,11 @@ class ColorInput:
         while True:
             try:
                 input_data = input(Fore.CYAN + Style.BRIGHT + message)
+                input_data = datetime.strptime(input_data, '%d.%m.%Y')
 
-                if  self.__patern[0] <= datetime.strptime(input_data, '%d.%m.%Y') <= self.__patern[1]:
+                if datetime.strptime(self.__patern[0], '%d.%m.%Y') <= \
+                        input_data \
+                        <= datetime.strptime(self.__patern[1], '%d.%m.%Y'):
                     break
                 else:
                     print(Fore.LIGHTRED_EX + Style.BRIGHT + "Дата за пределами диапазона. Повторите попытку.")

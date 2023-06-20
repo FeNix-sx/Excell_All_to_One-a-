@@ -2,7 +2,7 @@ import os
 import time
 import pandas as pd
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from pandas import DataFrame
 from mytools.tool_class import NamesPhone, ColorInput, ColorPrint
 
@@ -10,7 +10,7 @@ from mytools.tool_class import NamesPhone, ColorInput, ColorPrint
 printer = ColorPrint().print_error
 printinf = ColorPrint().print_info
 printw = ColorPrint().print_warning
-printw("version 1.4")
+printw("version 1.5")
 
 change_series = NamesPhone()
 FILTER_RES = ["Продажа", "Логистика", "Возврат"]
@@ -20,6 +20,11 @@ class ExcelAllInOne:
         printw("Программа собирает информацию из ВСЕХ *.xlsx файлов,\nнаходящихся в папке 'Excel_Files'")
         self.xlsx_files = list()
         self.df_full = DataFrame()
+        self.df_art_date = DataFrame()
+        self.date_begin = None
+        self.date_end = None
+        self.inp_begin = None
+        self.inp_end = None
         time.sleep(2)
 
     def get_files_names(self) -> list:
@@ -67,36 +72,53 @@ class ExcelAllInOne:
                 printinf(f"файл {file} загружен")
             print()
 
-            data_begin = df_full["дата"].min()
-            data_end = df_full["дата"].max()
+            self.df_full = df_full
+            self.data_begin = df_full["дата"].min().date()
+            self.date_end = df_full["дата"].max()
 
+        except Exception as ex:
+            print(f"Ошибка! {ex}")
+
+    def set_date_begin_end(self) -> None:
+
+        try:
             printw(f"Задайте интересующий временной интервал для выборки данных",
-                   f"нижняя граница: {data_begin.strftime('%d.%m.%Y')}",
-                   f"верхняя граница: {data_end.strftime('%d.%m.%Y')}",
+                   f"нижняя граница: {self.data_begin}",
+                   f"верхняя граница: {self.date_end.date()}",
                    sep="\n")
 
-            inputdata = ColorInput([data_begin, data_end]).cinput_date
+            inputdata = ColorInput([self.data_begin, self.date_end]).cinput_date
 
-            inp_begin = datetime.strptime(inputdata(" c ->: "), '%d.%m.%Y')
-            inp_end = datetime.strptime(inputdata("по ->: "), '%d.%m.%Y')
+            inp_begin = inputdata(" c ->: ")
+            inp_end = inputdata("по ->: ")
             print()
 
             printinf(f"Выбран диапазон дат: {inp_begin.strftime('%d.%m.%Y')} - {inp_end.strftime('%d.%m.%Y')}")
-            # заменяем текстовое поле обоснование на поля с int
-            df_dummies = pd.get_dummies(df_full["обоснование"], dtype=int)
 
-            df_full = pd.concat([df_full, df_dummies], axis=1)
+            self.inp_begin, self.inp_end = inp_begin, inp_end
+
+        except Exception as ex:
+            print(f"Ошибка! {ex}")
+
+    def transformation_dataframe(self):
+        try:
+            # заменяем текстовое поле обоснование на поля с int
+            df_dummies = pd.get_dummies(self.df_full["обоснование"], dtype=int)
+
+            df_full = pd.concat([self.df_full, df_dummies], axis=1)
             del df_dummies
 
             # налог и прибыль не учитывается когда был возврат
             df_full.loc[df_full['Возврат'] == 1, 'налог'] *= 0
             df_full.loc[df_full['Возврат'] == 1, 'к перечислению'] *= 0
 
+            self.df_art_date = df_full[["артикул", "дата"]].copy()
+
             df_full = df_full[
-                (df_full["дата"] >= inp_begin) &
-                (df_full["дата"] <= inp_end)
-                ]
-            # удалаем поле ["дата", "обоснование"]
+                (df_full["дата"] >= self.inp_begin) &
+                (df_full["дата"] <= self.inp_end)
+            ]
+            # удаляем поле ["дата", "обоснование"]
             df_full.drop(["дата", "обоснование", "Телефон"], axis=1, inplace=True)
             # создаем поле с чистой прибылью
             df_full.insert(
@@ -116,6 +138,8 @@ class ExcelAllInOne:
                     'код', 'Возврат', 'Логистика', 'Продажа', 'Штрафы'
                 ]
             ]
+            del df_full
+
             return self.df_full
 
         except Exception as ex:
@@ -170,6 +194,73 @@ class ExcelAllInOne:
         except Exception as ex:
             print(f"Ошибка! {ex}")
 
+    def create_table_to_excel(self, group, GROUP_LIST):
+        """
+        Создаем таблицу для выгрузки в Excel
+        :param group:
+        :param GROUP_LIST:
+        :return:
+        """
+        # задаем список полей для агрегации
+        agg_list = [item for item in self.df_full.columns if item not in GROUP_LIST]
+        agg_dict = {item: "sum" for item in agg_list}
+        df_result = self.df_full.groupby(  # группировка DataFrame по параметру списка group
+            [group],
+            as_index=False
+        ).aggregate(  # агрегирование столбцов
+            agg_dict
+        )
+        # сортировка
+        df_result = df_result.sort_values('Кол-во', ascending=False)
+
+        # создаем список столбцов для агрегации (суммирования в данном случае)
+        colum_list = [
+            df_result[item].astype(float).sum() for item in agg_list
+        ]
+        # добавляем строку в конец таблицы
+        df_result.loc[len(df_result.index)] = [
+            '### И Т О Г О ###',
+            *colum_list
+        ]
+        df_result.insert(loc=0, column='№ п/п', value=range(1, len(df_result) + 1))
+        return df_result
+
+    def last_five_days_table(self) -> DataFrame:
+        """
+        Создаем таблицу для подсчета продаж за последние 5 дней для каждого артикула
+        (хз для чего она ему!?!?!)
+        :return:
+        """
+        try:
+            # df_test = self.df_art_date
+            # выбираем последние 5 дней
+            # для сравнения использовать формат ТОЛЬКО ТАКОЙ: 2023-04-01 00:00:00
+            df_test = self.df_art_date[(self.df_art_date["дата"] >= self.date_end - timedelta(days=5))]
+            # заменяем текстовое поле обоснование на поля с int (строки стали столбцами)
+            df_dummies = pd.get_dummies(df_test["дата"], dtype=int)
+            # приводим заголовки к виду "00.00.0000"
+            column_names_dict = dict()
+            for date in df_dummies.columns.tolist():
+                column_names_dict[date] = date.strftime('%d.%m.%Y')
+            df_dummies = df_dummies.rename(columns=column_names_dict)
+
+            df_test = pd.concat([df_test[["артикул"]], df_dummies], axis=1)
+            del df_dummies
+            # группировка и агрегирование по артикулу
+            df_result = df_test.groupby(  # группировка DataFrame по полю "артикул"
+                ["артикул"],
+                as_index=False
+            ).aggregate(  # агрегирование столбцов
+                "sum"
+            )
+            df_result["days"] = df_result.iloc[:, 1:].sum(axis=1)
+            del df_test
+
+            self.df_art_date = df_result.sort_values('артикул', ascending=True)
+
+        except Exception as ex:
+            print(ex)
+
     def write_to_excel(self) -> None:
         """
         Запись данных в Excel-файл
@@ -187,28 +278,7 @@ class ExcelAllInOne:
             # создаем файл result_file_name
             with pd.ExcelWriter(result_file_name, engine='xlsxwriter') as writer:
                 for group in GROUP_LIST:
-                    # задаем список полей для агрегации
-                    agg_list = [item for item in df_full.columns if item not in GROUP_LIST]
-                    agg_dict = {item: "sum" for item in agg_list}
-                    df_result = df_full.groupby(  # группировка DataFrame по параметру списка group
-                        [group],
-                        as_index=False
-                    ).aggregate(  # агрегирование столбцов
-                        agg_dict
-                    )
-                    # сортировка
-                    df_result = df_result.sort_values('Кол-во', ascending=False)
-
-                    # создаем список столбцов для агрегации (суммирования в данном случае)
-                    colum_list = [
-                        df_result[item].astype(float).sum() for item in agg_list
-                    ]
-                    # добавляем строку в конец таблицы
-                    df_result.loc[len(df_result.index)] = [
-                        '### И Т О Г О ###',
-                        *colum_list
-                    ]
-                    df_result.insert(loc=0, column='№ п/п', value=range(1, len(df_result) + 1))
+                    df_result = self.create_table_to_excel(group, GROUP_LIST)
                     # создаем лист group в файле result_file_name и записываем туда df_result
                     df_result.to_excel(
                         writer,
@@ -243,6 +313,39 @@ class ExcelAllInOne:
 
                     del df_result
 
+                # создаем лист 5days в файле result_file_name и записываем туда df_art_date
+                self.df_art_date.to_excel(
+                    writer,
+                    sheet_name=f"5days",
+                    index=False,
+                    startrow=0
+                )
+
+                # получаем объект workbook и worksheet нужного листа
+                workbook = writer.book
+                worksheet = writer.sheets[f"5days"]
+
+                # задаем ширину столбцов
+                for i, col in enumerate(self.df_art_date):
+                    max_width = max(self.df_art_date[col].astype(str).map(len).max(), len(col))
+                    worksheet.set_column(i, i, max_width + 2)
+
+                # задаем стиль для заголовка таблицы
+                header_style = workbook.add_format({
+                    'bg_color': 'black', 'font_color': 'white',
+                    'bold': True, 'align': 'center'
+                })
+
+                # Задаем заголовок таблицы
+                for i, header in enumerate(self.df_art_date.columns):
+                    worksheet.write(0, i, header, header_style)
+
+                # last_row = len(self.df_art_date)
+                # bold_format = workbook.add_format({
+                #     'bold': True, 'font_color': 'red'
+                # })
+                # worksheet.set_row(last_row, None, bold_format)
+
             printinf(f"Файл {result_file_name} создан.")
             printinf("Программа успешно завершена")
             time.sleep(3)
@@ -250,13 +353,20 @@ class ExcelAllInOne:
         except Exception as ex:
             print(f"Ошибка! {ex}")
 
-    def main(self):
-        self.get_files_names()
-        if not self.check_xlsx_files():
-            return
-        self.merge_data()
-        self.write_to_excel()
 
+
+    def main(self):
+        try:
+            self.get_files_names()
+            if not self.check_xlsx_files():
+                return
+            self.merge_data()
+            self.set_date_begin_end()
+            self.transformation_dataframe()
+            self.last_five_days_table()
+            self.write_to_excel()
+        except:
+            pass
 
 if __name__ == '__main__':
     runscript = ExcelAllInOne()
