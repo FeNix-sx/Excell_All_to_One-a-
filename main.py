@@ -225,17 +225,16 @@ class ExcelAllInOne:
         df_result.insert(loc=0, column='№ п/п', value=range(1, len(df_result) + 1))
         return df_result
 
-    def last_five_days_table(self) -> DataFrame:
+    def last_seven_days_table(self) -> DataFrame:
         """
         Создаем таблицу для подсчета продаж за последние 5 дней для каждого артикула
         (хз для чего она ему!?!?!)
         :return:
         """
         try:
-            # df_test = self.df_art_date
-            # выбираем последние 5 дней
+            # выбираем последние 7 дней
             # для сравнения использовать формат ТОЛЬКО ТАКОЙ: 2023-04-01 00:00:00
-            df_test = self.df_art_date[(self.df_art_date["дата"] >= self.date_end - timedelta(days=5))]
+            df_test = self.df_art_date[(self.df_art_date["дата"] >= self.date_end - timedelta(days=6))]
             # заменяем текстовое поле обоснование на поля с int (строки стали столбцами)
             df_dummies = pd.get_dummies(df_test["дата"], dtype=int)
             # приводим заголовки к виду "00.00.0000"
@@ -253,10 +252,15 @@ class ExcelAllInOne:
             ).aggregate(  # агрегирование столбцов
                 "sum"
             )
-            df_result["days"] = df_result.iloc[:, 1:].sum(axis=1)
+            df_result["дней"] = df_result.iloc[:, 1:].apply(lambda x: x[x !=0].count() ,axis=1)
+            df_result["количество"] = df_result.iloc[:, 1:-1].sum(axis=1)
+            df_result["ср.коэф"] = round(df_result["количество"]/7, 6)
             del df_test
-
-            self.df_art_date = df_result.sort_values('артикул', ascending=True)
+            columns = list(df_result.columns)
+            # меняем местами столбцы
+            columns[8], columns[9], columns[10] = columns[10], columns[8], columns[9]
+            df_result = df_result[columns]
+            self.df_art_date = df_result.sort_values("ср.коэф", ascending=False)
 
         except Exception as ex:
             print(ex)
@@ -289,6 +293,8 @@ class ExcelAllInOne:
                     # получаем объект workbook и worksheet нужного листа
                     workbook = writer.book
                     worksheet = writer.sheets[f"{group}"]
+                    # закрепляем первую строку
+                    worksheet.freeze_panes(1, 0)
 
                     # задаем ширину столбцов
                     for i, col in enumerate(df_result):
@@ -313,17 +319,19 @@ class ExcelAllInOne:
 
                     del df_result
 
-                # создаем лист 5days в файле result_file_name и записываем туда df_art_date
+                # создаем лист seven_days в файле result_file_name и записываем туда df_art_date
                 self.df_art_date.to_excel(
                     writer,
-                    sheet_name=f"5days",
+                    sheet_name=f"seven_days",
                     index=False,
                     startrow=0
                 )
 
                 # получаем объект workbook и worksheet нужного листа
                 workbook = writer.book
-                worksheet = writer.sheets[f"5days"]
+                worksheet = writer.sheets[f"seven_days"]
+                # закрепляем первую строку
+                worksheet.freeze_panes(1, 0)
 
                 # задаем ширину столбцов
                 for i, col in enumerate(self.df_art_date):
@@ -340,20 +348,12 @@ class ExcelAllInOne:
                 for i, header in enumerate(self.df_art_date.columns):
                     worksheet.write(0, i, header, header_style)
 
-                # last_row = len(self.df_art_date)
-                # bold_format = workbook.add_format({
-                #     'bold': True, 'font_color': 'red'
-                # })
-                # worksheet.set_row(last_row, None, bold_format)
-
             printinf(f"Файл {result_file_name} создан.")
             printinf("Программа успешно завершена")
             time.sleep(3)
 
         except Exception as ex:
             print(f"Ошибка! {ex}")
-
-
 
     def main(self):
         try:
@@ -363,7 +363,7 @@ class ExcelAllInOne:
             self.merge_data()
             self.set_date_begin_end()
             self.transformation_dataframe()
-            self.last_five_days_table()
+            self.last_seven_days_table()
             self.write_to_excel()
         except:
             pass
