@@ -1,8 +1,9 @@
 import csv
 import os
 import time
-from datetime import datetime
+import openpyxl
 
+from datetime import datetime
 from pandas import Series
 from colorama import init, Fore, Style
 init(autoreset=True)
@@ -69,6 +70,7 @@ class ColorPrint:
 
 
 class CodeNamePhone:
+    """принимает имя файла csv, из которого потом может прочитать значения"""
     def __init__(self, filename):
         self.__filename = self.__chek_name(filename)
 
@@ -79,9 +81,9 @@ class CodeNamePhone:
             print("Ошибка! Не найден файл 'models.csv', или имя файла изменено!")
 
     @property
-    def get_names_code(self) -> dict:
+    def get_names_code_csv(self) -> dict:
         """
-        Читает модели телефона возвращает словарь с ними:
+        Читает модели телефона из файла csv и возвращает словарь с ними:
         ключ - название (вместо "/" пробел)
         значение - код из 6 цифр
         :return: dict
@@ -111,6 +113,33 @@ class CodeNamePhone:
             print("Не удалось загрузить список смартфоном. Возможно отсутствует файл 'models.csv'")
             return None
 
+    @property
+    def get_names_code_xlsx(self)->dict:
+        """
+        Читает модели телефона из файла csv и возвращает словарь с ними:
+        ключ - название (вместо "/" пробел)
+        значение - код из 6 цифр
+        :return: dict (ключ: str, значения: list)
+        """
+        try:
+
+            workbook = openpyxl.load_workbook("models.xlsx")
+            sheet = workbook.active
+            models = {}
+
+            for row in sheet.iter_rows(min_row=2):
+                key = row[0].value
+                value = row[1].value.split(",")
+
+                if key:
+                    models[key] = value
+
+            return models
+
+        except Exception as ex:
+            print(ex)
+            print("Не удалось загрузить список смартфоном. Возможно отсутствует файл 'models.xlsx'")
+            return None
 
 class NamesPhone:
     def __init__(self):
@@ -118,7 +147,7 @@ class NamesPhone:
 
     def __chek_folder_name(self) -> dict:
         try:
-            names_codes_dict: dict = CodeNamePhone("models.csv").get_names_code
+            names_codes_dict: dict = CodeNamePhone("models.xlsx").get_names_code_xlsx
             return names_codes_dict
 
         except ValueError:
@@ -130,8 +159,30 @@ class NamesPhone:
             time.sleep(3)
             return False
 
+    def __chek_folder_name_xlsx(self) -> dict:
+        try:
+            names_codes_dict: dict = CodeNamePhone("models.csv").get_names_code_xlsx
+            return names_codes_dict
+
+        except ValueError:
+            print(
+                Fore.LIGHTRED_EX + f"Ошибка! Должна быть одна папка с названием/кодом телефона.\n",
+                Fore.LIGHTRED_EX + f"Проверьте наличие папки, её название или удалите лишние папки.",
+                sep=''
+            )
+            time.sleep(3)
+            return False
+
+
     def __rename_folder(self, old_name: str, new_name: str) -> None:
         os.rename(old_name, new_name)
+
+    def __find_name(self, item):
+        item = item.split("d")[0]
+        for key, value in self.__phonename.items():
+            if item in value:
+                return key
+
 
     def get_names_phone(self, series: Series) -> Series:
         """
@@ -140,7 +191,7 @@ class NamesPhone:
         :return:
         """
         try:
-            result = Series(self.__phonename[item] for item in series)
+            result = Series(self.__find_name(item) for item in series)
             return result
         except Exception as ex:
             print(f"Ошибка! {ex}")

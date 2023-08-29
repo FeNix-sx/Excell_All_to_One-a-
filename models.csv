@@ -1,40 +1,312 @@
-﻿name_RF;model_name
-200001;Samsung A12
-200002;Samsung A32 (4G)
-200003;Samsung A52 (4G)
+Articul;Model
+200001S1;Samsung A12
+200001S2;Samsung M12
+200001U;Samsung A12/M12
+200002;Samsung A32
+200003;Samsung A52
+200004;Samsung A72
+200005;Samsung S21
+200006;Samsung S21+
+200007;Samsung S21 Ultra
 200008;Xiaomi Redmi 9
 200009;Xiaomi Redmi 9C
 200010;Xiaomi Redmi 9A
-200011;Xiaomi Redmi Note 9S/Redmi Note 9 Pro
-200012;Xiaomi Redmi Note 10/Redmi Note 10S
+200011S1;Xiaomi Redmi Note 9S
+200011S2;Xiaomi Redmi Note 9 Pro
+200011U;Xiaomi Redmi Note 9S/Note 9 Pro
+200012S1;Xiaomi Redmi Note 10
+200012S2;Xiaomi Redmi Note 10S
+200012U;Xiaomi Redmi Note 10/Note 10S
 200013;Xiaomi Redmi Note 10 Pro
-200016;iPhone 7/8/SE (2020)/SE (2022)
-200018;iPhone X/Xs
-200019;iPhone Xs Max
-200020;iPhone Xr
-200108;iPhone 11
-200026;Samsung A22 (4G)
+200014;Xiaomi Mi 11
+200015;Xiaomi Mi 11 lite
+200016S1;Apple iPhone 7
+200016S2;Apple iPhone 8
+200016S3;Apple iPhone SE 2020
+200016U;Apple iPhone 7/8/SE 2020
+200017S1;Apple iPhone 7 Plus
+200017S2;Apple iPhone 8 Plus
+200017U;Apple iPhone 7 plus/8 plus
+200018S1;Apple iPhone XS
+200018S2;Apple iPhone X
+200018U;Apple iPhone X/XS
+200019;Apple iPhone XS Max
+200020;Apple iPhone XR
+200021;Apple iPhone 11
+200022;Apple iPhone 11 Pro
+200023;Apple iPhone 11 Pro Max
+200024S1;Apple iPhone 12
+200024S2;Apple iPhone 12 Pro
+200024U;Apple iPhone 12/12 Pro
+200025;Apple iPhone 12 Pro Max
+200026S1;Samsung A22
+200026S2;Samsung M32
+200026U;Samsung A22/M32
 200027;Xiaomi Redmi 9T
-200029;Samsung A51 (4G)
+200028S1;Samsung A50
+200028S2;Samsung A30s
+200028S3;Samsung A50s
+200028U;Samsung A50/A30S/A50S
+200029;Samsung A51
 200030;Xiaomi Redmi Note 8 Pro
-200031;Honor 8X (2018)
+200031;Honor 8x
+200032;Samsung A31
+200033;Samsung A21S
 200034;Xiaomi Redmi Note 9
-200035;Honor 9X/Huawei Y9 Prime 2019
-200042;Realme 8/Realme 8 Pro
-200051;Xiaomi Poco M3
+200035S1;Huawei Honor 9X
+200035S2;Huawei Y9 Prime 2019
+200035U;Honor 9X/Huawei Y9 Prime 2019
+200036;Huawei P Smart 2021
+200037;realme C15
+200038;realme C21
+200039;Samsung A5 2017
+200040;realme C3
+200041S1;realme C25
+200041S2;realme C25S
+200041U;realme C25/C25S
+200042;realme 8 Pro
+200043;realme C11 2020
+200044;Samsung S21 FE
+200045;Samsung S20 FE
+200046;Samsung S20
+200047;Samsung S20+
+200048;Samsung S20 Ultra
+200049;Samsung Note 20 Ultra
+200050;Samsung Note 20
+200051;Poco M3
+200052S1;Poco M3 Pro 5G
+200052S2;Xiaomi Redmi Note 10T
+200052U;Poco M3 Pro/Redmi Note 10T
 200053;Xiaomi Redmi Note 7
-200055;iPhone 6/6S
-200081;Xiaomi Poco X3/Poco X3 Pro/Poco X3 NFS
+200054S1;Xiaomi Redmi Note 4
+200054S2;Xiaomi Redmi Note 4X
+200054U;Xiaomi Redmi Note 4/Note 4x
+200055S1;Apple iPhone 6
+200055S2;Apple iPhone 6s
+200055U;Apple iPhone 6/6S
+200056S1;Apple iPhone 6 Plus
+200056S2;Apple iPhone 6s Plus
+200056U;Apple iPhone 6 plus/6S plus
+200057S1;Huawei Honor 10i
+200057S2;Huawei Honor 20i
+200057S3;Huawei P Smart Plus 2019
+200057U;Honor 10i/20i/P Smart Plus 2019
+200058S1;Huawei P30 Lite
+200058S2;Huawei Honor 20S
+200058U;Huawei P30 lite/Honor 20S
+200059S1;Huawei P40 lite E
+200059S2;Huawei Honor 9C
+200059U;Huawei P40 lite E/Honor 9C
+200060S1;Samsung M30s
+200060S2;Samsung M21
+200060U;Samsung M30s/M21
+200061;Apple iPhone 13 mini
+200062;Apple iPhone 13
+200063;Apple iPhone 13 Pro
+200064;Apple iPhone 13 Pro Max
+200065;Apple iPhone 12 mini
+200066;Samsung A03S
+200067S1;Samsung A30
+200067S2;Samsung A20
+200067U;Samsung A30/A20
+200068;Samsung A70
+200069;Samsung M31S
+200070;Samsung A7 2018 (A750)
+200071;Samsung S7
+200072;Samsung S8
+200073;Samsung S9
+200074;Samsung S10
+200075;Samsung S10+
+200077;Xiaomi Redmi Note 8T
+200078;Xiaomi Redmi Note 8
+200079S1;Xiaomi Redmi Note 5
+200079S2;Xiaomi Redmi Note 5 Pro
+200079U;Xiaomi Redmi Note 5/Note 5 Pro
+200080S1;Xiaomi Redmi K20
+200080S2;Xiaomi Mi 9T
+200080U;Xiaomi Redmi K20/Mi 9T
+200081S1;Poco X3
+200081S2;Poco X3 Pro
+200081U;Poco X3/X3 Pro
+200082;Poco F3
+200083S1;Huawei P smart 2019
+200083S2;Huawei Honor 10 Lite
+200083U;Huawei P Smart 2019/Honor 10 Lite
+200084;Huawei P Smart 2018
+200085S1;Huawei Y8p
+200085S2;Huawei Honor 30I
+200085U;Huawei Y8p/Honor 30i
+200086S1;Huawei Y6 2019
+200086S2;Huawei Honor 8A
+200086U;Huawei Y6 2019/Honor 8A
+200087;Huawei Honor 9 Lite
 200088;Xiaomi Redmi 10
-200088;Xiaomi Redmi 10
-200103;Xiaomi Mi 11T/11T Pro 
-200106;Xiaomi Redmi Note 11/Redmi Note 11S (4G)
-200112;iPhone 12
-200132;Samsung A53 (5G)
-200134;Realme 8i
-200136;Xiaomi Poco M4 Pro (5G)
+200089;Samsung A02
+200090;Samsung A02S
+200091;Huawei Nova 8
+200092;Huawei Nova 8 Pro
+200093S1;Huawei Honor 50
+200093S2;Huawei Nova 9
+200093U;Honor 50/Huawei Nova 9
+200094S1;Huawei Honor 50 Lite
+200094S2;Huawei Nova 8i
+200094U;Honor 50 Lite/Huawei Nova 8i
+200095;Samsung M52
+200096;Samsung A71
+200097;Huawei Honor 10x lite
+200098;Xiaomi Redmi 7a
+200099;Samsung A13 4G
+200100;Samsung S22
+200101;Samsung S22+
+200102;Samsung S22 ultra
+200103S1;Xiaomi 11T
+200103S2;Xiaomi Mi 11T Pro�
+200103U;Xiaomi Mi 11t/Mi 11T Pro�
+200104;Samsung S22 Pro
+200105;Samsung A22S 5G
+200106S1;Xiaomi Redmi Note 11
+200106S2;Xiaomi Redmi Note 11S
+200106U;Xiaomi Redmi Note 11/Note 11S
+200107;Xiaomi Redmi Note 11 Pro
+200119;Honor 10
+200120;Huawei P20 lite
+200121;Xiaomi Mi 10 lite
+200122S1;Huawei Y6 Prime 2018
+200122S2;"Huawei Honor 7A 5.7"""
+200122S3;"Huawei 7C 5.7"""
+200122U;"Huawei Y6 Prime 2018/Honor 7A 5.7""/Huawei 7C 5.7"""
+200123;Xiaomi Mi Max 2
+200124;Xiaomi Mi Max 3
+200125;Samsung A03
+200126;Samsung A03 Core
+200127;realme 6Pro
+200128;Xiaomi Redmi 5
+200129;Honor 60
+200130;Honor 60 Pro
+200131;Oneplus 9 Pro
+200132;Samsung A53
+200133;realme GT 5G
+200134;realme 8i
+200135;realme C21y
+200136;Poco M4 Pro 5G
+200137;Xiaomi Redmi 5 Plus
+200138;Xiaomi Redmi 6
+200139;Xiaomi Redmi 6A
+200140S1;Xiaomi Redmi 7
+200140S2;Xiaomi Redmi Y3
+200140U;Xiaomi Redmi 7/Xiaomi Redmi Y3
 200141;Xiaomi Redmi 8
-200149;Honor X8 (2022)
+200142;Xiaomi Redmi 8A
+200143;Xiaomi Mi 10T
+200144S1;Huawei Honor 20
+200144S2;Huawei Nova 5T
+200144U;Honor 20/Hauwei Nova 5T
+200145;Honor 20 Pro
+200146S1;"Huawei Honor 7A 5.45"""
+200146S2;Huawei Y5 Prime 2018
+200146S3;Huawei Y5 Lite 2018
+200146U;"Honor 7A 5.45""/Huawei Y5 Prime(2018)/Huawei Y5 Lite"
+200147S1;Huawei Y5p
+200147S2;Huawei Honor 9S
+200147U;Huawei Y5P/Honor 9S
+200148S1;Huawei P40 lite
+200148S2;Huawei Nova 6 SE
+200148U;Huawei P40Lite/Huawei Nova 6SE
+200149;Honor X8
+200150S1;Samsung A10
+200150S2;Samsung M10
+200150U;Samsung A10/M10
+200151;Samsung A33
+200152;Samsung A73
+200153;Samsung M51
+200154S1;Samsung J2 Prime
+200154S2;Samsung Grand Prime
+200154U;Samsung J2 Prime/Grand Prime
+200155S1;Samsung J2 Pro 2018
+200155S2;Samsung J2 2018
+200155S3;Samsung J250
+200155U;Samsung J2 Pro (2018)/J2(2018)/J250
+200156;Samsung J2 Core
+200157S1;Samsung J1 2016
+200157S2;Samsung J120
+200157U;Samsung J1 (2016)/J120
+200158S1;Samsung J3 2016
+200158S2;Samsung J310
+200158S3;Samsung J320
+200158U;Samsung J3 (2016)/J310/J320
+200159S1;Samsung J5 2016
+200159S2;Samsung J510
+200159U;Samsung J5 (2016)/J510
+200160S1;Samsung J3 2017
+200160S2;Samsung J330
+200160U;Samsung J3 (2017)/J330
+200161S1;Samsung J5 2017
+200161S2;Samsung J530
+200161U;Samsung J5 (2017)/J530
+200162;Honor 9 x Lite
+200163;Xiaomi Redmi Note 9T
+200164;Huawei Y9 2019
 200166;Xiaomi Redmi 10C
-200167;Xiaomi Poco X4 Pro (5G)
-200173;Realme C11 (2021)/C20 (2021)
+200167;Poco X4 Pro 5g
+200168;Xiaomi Mi 12X
+200169;realme 9 Pro
+200170;realme 9 Pro +
+200171;Samsung A23
+200172;Samsung M53
+200173S1;realme C11 2021
+200173S2;realme C20 2021
+200173U;realme C11 (2021)/C20 (2021)
+200174;Huawei Y7 2019
+200175;realme 9i
+200176;Samsung A13 5G
+200177S1;Apple iPhone 5
+200177S2;Apple iPhone 5S
+200177S3;Apple iPhone SE 2016
+200177U;Apple iPhone 5/5S/SE (2016)
+200178;Samsung M33
+200179S1;Poco F4 GT
+200179S2;Xiaomi Redmi K50 Gaming Edition
+200179U;Xiaomi Poco F4 GT/Redmi K50 Gaming Edition
+200180;Xiaomi Mi 12 Pro
+200181;Poco X3 GT
+200182S1;realme GT Master Edition
+200182S2;realme Q3 Pro
+200182U;realme GT Master Edition/Q3 Pro
+200183;OnePlus 10 Pro
+200184S2;OnePlus 3T
+200184U;OnePlus 3
+200185;OnePlus Nord 2
+200186;OnePlus Nord 2T
+200187;OPPO A53 (2020)
+200188;Realme GT Neo 3
+200189;Vivo V21E
+200190;Vivo V23E
+200191;Vivo Y11
+200192S1;Vivo  Y1S
+200192S2;Vivo Y91C
+200192U;Vivo  Y1S/Y91C
+200193S1;Vivo Y31
+200193S2;Vivo Y53S
+200193U;Vivo Y31/Y53S
+200194;Xiaomi Redmi 10A
+200195;Apple iPhone 14 (6.1)
+200196;Apple iPhone 14 Plus (6.7)
+200197;Apple iPhone 14 Pro (6.1)
+200198;Apple iPhone 14 Pro Max (6.7)
+200199S1;Huawei  Nova Y70
+200199S2;Huawei  NovaY70 Plus (4G)
+200199S3;Huawei  Enjoy 50 (4G)
+200199U;Huawei  Nova Y70/NovaY70 Plus (4G)/Enjoy 50 (4G)
+200200;Xiaomi Poco M5
+200201;realme C35
+200202;realme C30
+200203;Huawei Nova 2
+200204;Huawei Nova 2 Plus
+200205;Xiaomi  12 Lite
+200206;Huawei nova 9SE
+200207;Huawei  Nova Y90
+200208;Samsung  S8 Plus
+200209S1;Honor 8S
+200209S2;Huawei Y5 (2019)
+200209U;Huawei Honor 8S / Huawei Y5 (2019)
+200210;Huawei  Y6P (2020)

@@ -10,7 +10,7 @@ from mytools.tool_class import NamesPhone, ColorInput, ColorPrint
 printer = ColorPrint().print_error
 printinf = ColorPrint().print_info
 printw = ColorPrint().print_warning
-printw("version 1.5")
+printw("version 1.6 (29.08.2023)")
 
 change_series = NamesPhone()
 FILTER_RES = ["Продажа", "Логистика", "Возврат"]
@@ -32,7 +32,6 @@ class ExcelAllInOne:
         Получение списка файлов из папки Excel_Files
         :return: list
         """
-
         try:
             folder_path = 'Excel_Files'
             while True:
@@ -56,7 +55,8 @@ class ExcelAllInOne:
         except Exception as ex:
             print(f"Ошибка! {ex}")
 
-    def check_xlsx_files(self):
+    def check_xlsx_files(self)->bool:
+        """проверка наличиня *.xlsx файлов"""
         if not self.xlsx_files:
             printer("Файлы не найдены. Программа завершена")
             time.sleep(3)
@@ -80,7 +80,6 @@ class ExcelAllInOne:
             print(f"Ошибка! {ex}")
 
     def set_date_begin_end(self) -> None:
-
         try:
             printw(f"Задайте интересующий временной интервал для выборки данных",
                    f"нижняя граница: {self.data_begin}",
@@ -153,7 +152,6 @@ class ExcelAllInOne:
         :return:
         """
         try:
-            # change_series = NamesPhone()
             filename = f"Excel_Files/{filename}"
             df_source = pd.read_excel(filename)
 
@@ -170,8 +168,11 @@ class ExcelAllInOne:
             ]]
 
             df_source.insert(loc=1, column="Телефон", value="")
-            df_source["телефон"] = change_series.get_names_phone(df_source["Артикул поставщика"].str[:6:])
+            # test1 = change_series.get_names_phone(df_source["Артикул поставщика"])
+            df_source["телефон"] = change_series.get_names_phone(df_source["Артикул поставщика"])
+            # test2 = df_source["Артикул поставщика"].str[-3:]
             df_source["Название"] = df_source["Артикул поставщика"].str[-3:]
+            # test3 = df_source["Артикул поставщика"]
             df_source["код телефона"] = df_source["Артикул поставщика"].str[:6]
 
             df_source = df_source.rename(columns={
