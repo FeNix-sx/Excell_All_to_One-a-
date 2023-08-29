@@ -127,7 +127,7 @@ class ExcelAllInOne:
                       df_full["налог"] -
                       df_full["логистика_затраты"] -
                       df_full["штрафы_затраты"] -
-                      df_full["Логистика"] * 157
+                      df_full["Логистика"] * 157.5
             )
             # меняем местами столбцы
             self.df_full = df_full[
