@@ -75,10 +75,10 @@ class CodeNamePhone:
         self.__filename = self.__chek_name(filename)
 
     def __chek_name(self, filename: str) -> str:
-        if filename.endswith("models.csv"):
+        if filename.endswith("models.xlsx"):
             return filename
         else:
-            print("Ошибка! Не найден файл 'models.csv', или имя файла изменено!")
+            print("Ошибка! Не найден файл 'models.xlsx', или имя файла изменено!")
 
     @property
     def get_names_code_csv(self) -> dict:
@@ -122,8 +122,7 @@ class CodeNamePhone:
         :return: dict (ключ: str, значения: list)
         """
         try:
-
-            workbook = openpyxl.load_workbook("models.xlsx")
+            workbook = openpyxl.load_workbook(self.__filename)
             sheet = workbook.active
             models = {}
 
@@ -146,22 +145,9 @@ class NamesPhone:
         self.__phonename = self.__chek_folder_name()
 
     def __chek_folder_name(self) -> dict:
+        """проверка загрузки файла с моделями models.xlsx"""
         try:
             names_codes_dict: dict = CodeNamePhone("models.xlsx").get_names_code_xlsx
-            return names_codes_dict
-
-        except ValueError:
-            print(
-                Fore.LIGHTRED_EX + f"Ошибка! Должна быть одна папка с названием/кодом телефона.\n",
-                Fore.LIGHTRED_EX + f"Проверьте наличие папки, её название или удалите лишние папки.",
-                sep=''
-            )
-            time.sleep(3)
-            return False
-
-    def __chek_folder_name_xlsx(self) -> dict:
-        try:
-            names_codes_dict: dict = CodeNamePhone("models.csv").get_names_code_xlsx
             return names_codes_dict
 
         except ValueError:
@@ -182,7 +168,6 @@ class NamesPhone:
         for key, value in self.__phonename.items():
             if item in value:
                 return key
-
 
     def get_names_phone(self, series: Series) -> Series:
         """
