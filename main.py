@@ -108,6 +108,10 @@ class ExcelAllInOne:
             del df_dummies
 
             # налог и прибыль не учитывается когда был возврат
+            if 'Возврат' not in df_full.columns:
+                df_full["Возврат" ] = 0
+                print("Добавлены Возврат")
+
             df_full.loc[df_full['Возврат'] == 1, 'налог'] *= 0
             df_full.loc[df_full['Возврат'] == 1, 'к перечислению'] *= 0
 
@@ -129,6 +133,10 @@ class ExcelAllInOne:
                       df_full["штрафы_затраты"] -
                       df_full["Логистика"] * 157.5
             )
+            if 'Штрафы' not in df_full.columns:
+                df_full["Штрафы" ] = 0
+                print("Добавлены Штрафы")
+
             # меняем местами столбцы
             self.df_full = df_full[
                 [
@@ -259,7 +267,7 @@ class ExcelAllInOne:
             del df_test
             columns = list(df_result.columns)
             # меняем местами столбцы
-            columns[8], columns[9], columns[10] = columns[10], columns[8], columns[9]
+            columns[-3], columns[-2], columns[-1] = columns[-1], columns[-3], columns[-2]
             df_result = df_result[columns]
             self.df_art_date = df_result.sort_values("ср.коэф", ascending=False)
 
