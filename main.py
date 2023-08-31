@@ -10,7 +10,7 @@ from mytools.tool_class import NamesPhone, ColorInput, ColorPrint
 printer = ColorPrint().print_error
 printinf = ColorPrint().print_info
 printw = ColorPrint().print_warning
-printw("version 1.6 (29.08.2023)")
+printw("version 1.6 (30.08.2023)")
 
 change_series = NamesPhone()
 FILTER_RES = ["Продажа", "Логистика", "Возврат"]
@@ -110,7 +110,6 @@ class ExcelAllInOne:
             # налог и прибыль не учитывается когда был возврат
             if 'Возврат' not in df_full.columns:
                 df_full["Возврат" ] = 0
-                print("Добавлены Возврат")
 
             df_full.loc[df_full['Возврат'] == 1, 'налог'] *= 0
             df_full.loc[df_full['Возврат'] == 1, 'к перечислению'] *= 0
@@ -135,7 +134,6 @@ class ExcelAllInOne:
             )
             if 'Штрафы' not in df_full.columns:
                 df_full["Штрафы" ] = 0
-                print("Добавлены Штрафы")
 
             # меняем местами столбцы
             self.df_full = df_full[

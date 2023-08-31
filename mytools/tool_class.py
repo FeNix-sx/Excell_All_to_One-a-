@@ -59,6 +59,7 @@ class ColorPrint:
     def __print(self, color_style, *args, **kwargs):
         message = [color_style + arg for arg in args]
         print(*message, **kwargs)
+
     def print_error(self, *args, **kwargs):
         self.__print(Fore.LIGHTRED_EX + Style.BRIGHT, *args, **kwargs)
 

@@ -69,7 +69,7 @@ def save_to_csv(models_dict: dict):
 
 def save_to_json(models_dict: dict):
     # Открытие файла для записи
-    with open("all_models.json", "w", encoding="utf-8", newline="") as json_file:
+    with open("2023.08.31_22.25.25.json", "w", encoding="utf-8", newline="") as json_file:
         # Сохранение словаря в JSON файл
         json.dump(models_dict, json_file, indent=4, separators=(",", ":"), sort_keys=models_dict.keys())
 
