@@ -903,7 +903,7 @@ class StatisticCollection:
     def draw(self):
         printy = ColorPrint().print_yellow
         text = self.__drawing
-        self.__out_info(text, printy, sleep_time=0.0009)
+        self.__out_info(text, printy, sleep_time=0.001)
 
     def print_smile(self):
         try:
