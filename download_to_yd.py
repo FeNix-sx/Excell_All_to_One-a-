@@ -1,12 +1,12 @@
 import time
-
 import json
 import os
 
 from concurrent.futures import ThreadPoolExecutor
 from yadisk import YaDisk
 from datetime import datetime
-from mytools.tool_class import ColorPrint, StatisticCollection
+from mytools.tool_class import ColorPrint
+from mytools.colletion_stat import StatisticCollection
 
 printer = ColorPrint().print_error
 printinf = ColorPrint().print_info
@@ -94,7 +94,7 @@ def main_func()->None:
 
 
 def main_multiprocessing():
-    printw("version 1.2 (02.09.2023)")
+    printw("version 1.2.1 (02.09.2023)")
     printw("Программа для сбора информации об интернет соединении")
     printinf('Благодарю за использование программы!')
     # Создаем экземпляр ThreadPoolExecutor с двумя потоками
