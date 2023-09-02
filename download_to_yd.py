@@ -1,11 +1,9 @@
 import time
 
-import requests
 import json
 import os
-import multiprocessing
-import threading
 
+from concurrent.futures import ThreadPoolExecutor
 from yadisk import YaDisk
 from datetime import datetime
 from mytools.tool_class import ColorPrint, StatisticCollection
@@ -93,21 +91,35 @@ def main_func()->None:
     content = statistic.get_full_info
     upload_to_yadick(content)
 
+# def main_multiprocessing():
+#     printw("version 1.2 (02.09.2023)")
+#     printw("Программа для сбора информации об интернет соединении")
+#     printinf('Благодарю за использование программы!')
+#
+#     # Создаем пул процессов с двумя процессами
+#     pool = multiprocessing.Pool(processes=2)
+#
+#     # Запускаем функции upload_to_yd() и calculate() в пуле процессов
+#     pool.apply_async(main_func,())
+#     pool.apply_async(statistic.draw,())
+#
+#     # Закрываем пул процессов и ждем завершения выполнения всех процессов
+#     pool.close()
+#     pool.join()
+
 def main_multiprocessing():
     printw("version 1.2 (02.09.2023)")
     printw("Программа для сбора информации об интернет соединении")
     printinf('Благодарю за использование программы!')
+    # Создаем экземпляр ThreadPoolExecutor с двумя потоками
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        # Запускаем функции statistic.draw и main_func в фоновом режиме
+        future1 = executor.submit(statistic.draw)
+        future2 = executor.submit(main_func)
 
-    # Создаем пул процессов с двумя процессами
-    pool = multiprocessing.Pool(processes=2)
-
-    # Запускаем функции upload_to_yd() и calculate() в пуле процессов
-    pool.apply_async(main_func,())
-    pool.apply_async(statistic.draw,())
-
-    # Закрываем пул процессов и ждем завершения выполнения всех процессов
-    pool.close()
-    pool.join()
+        # Ожидаем завершение обоих функций
+        future1.result()
+        future2.result()
 
 if __name__ == '__main__':
     main_multiprocessing()
