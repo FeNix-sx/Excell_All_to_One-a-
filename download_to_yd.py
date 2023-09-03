@@ -1,6 +1,7 @@
 import time
 import json
 import os
+import pickle
 
 from concurrent.futures import ThreadPoolExecutor
 from yadisk import YaDisk
@@ -73,13 +74,17 @@ def upload_to_yadick(content: dict)->None:
         # имя файла, равно текущему времени на ПК
         now = datetime.now()
         content['time_start'] = f'{now.strftime("%Y.%m.%d_%H:%M:%S")}'
-        filename = f'{now.strftime("%Y.%m.%d_%H.%M.%S")}.json'
+        filename = f'{now.strftime("%Y.%m.%d_%H.%M.%S")}.pickle'
         destination_path = f"{path_name + filename}"
 
-        # Открытие файла для записи
-        with open(filename, "w", encoding="utf-8", newline="") as json_file:
-            # Сохранение словаря в JSON файл
-            json.dump(content, json_file, indent=4)
+        # # Открытие файла для записи
+        # with open(filename, "w", encoding="utf-8", newline="") as json_file:
+        #     # Сохранение словаря в JSON файл
+        #     json.dump(content, json_file, indent=4)
+
+        # Сохранение словаря в бинарном файле
+        with open(filename, "wb") as file:
+            pickle.dump(content, file)
 
         yadisk.upload(filename, destination_path, overwrite=True)
         os.remove(filename)
