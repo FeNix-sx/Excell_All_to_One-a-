@@ -1,19 +1,8 @@
-import time
-import json
-import os
 import pickle
+import os
 
-from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
-from mytools.tool_class import ColorPrint
-from mytools.colletion_stat import StatisticCollection
 from mytools.working_to_yadisk import WorkingYandexDisk
-
-printer = ColorPrint().print_error
-printinf = ColorPrint().print_info
-printw = ColorPrint().print_warning
-printy = ColorPrint().print_yellow
-statistic = StatisticCollection()
 
 def upload_to_yadick(content: dict)->None:
     """
@@ -26,7 +15,7 @@ def upload_to_yadick(content: dict)->None:
     # YANDEX_TOKEN - токен яндекс REST API
     while True:
         try:
-            FOLDER_PATH = 'STATISTIC'
+            # FOLDER_PATH = 'STATISTIC'
             YANDEX_TOKEN = 'y0_AgAAAAABJQnxAAkufQAAAADiFPV_TjOFwUIbR6KNgvJ5KSFpjefPkow'
 
             if YANDEX_TOKEN == "":
@@ -61,31 +50,4 @@ def upload_to_yadick(content: dict)->None:
         os.remove(filename)
 
     except Exception as ex:
-        printer(ex)
-
-
-def main_func()->None:
-    content = statistic.get_full_info
-    upload_to_yadick(content)
-
-
-def main_multiprocessing():
-    printw("version 1.2.2 (02.09.2023)")
-    printw("Программа для сбора информации об интернет соединении")
-    printinf('Благодарю за использование программы!')
-    # Создаем экземпляр ThreadPoolExecutor с двумя потоками
-    with ThreadPoolExecutor(max_workers=2) as executor:
-        # Запускаем функции statistic.draw и main_func в фоновом режиме
-        future1 = executor.submit(statistic.draw)
-        future2 = executor.submit(main_func)
-
-        # Ожидаем завершение обоих функций
-        future1.result()
-        future2.result()
-
-
-if __name__ == '__main__':
-    main_multiprocessing()
-    printw('Каждый запуск помогает мне в обучении')
-    statistic.print_smile()
-    time.sleep(3)
+        print(ex)

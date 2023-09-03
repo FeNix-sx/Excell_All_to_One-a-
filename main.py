@@ -2,15 +2,19 @@ import os
 import time
 import pandas as pd
 
+from concurrent.futures import ThreadPoolExecutor
 from datetime import timedelta
 from pandas import DataFrame
 from mytools.tool_class import NamesPhone, ColorInput, ColorPrint
+from mytools.colletion_stat import StatisticCollection
+from mytools.tool_function import upload_to_yadick
 
 
 printer = ColorPrint().print_error
 printinf = ColorPrint().print_info
 printw = ColorPrint().print_warning
-printw("version 1.6 (30.08.2023)")
+
+printw("version 1.6.1 (03.09.2023)")
 
 change_series = NamesPhone()
 FILTER_RES = ["Продажа", "Логистика", "Возврат"]
@@ -378,6 +382,31 @@ class ExcelAllInOne:
         except:
             pass
 
-if __name__ == '__main__':
+
+def main_func()->None:
+    statistic = StatisticCollection()
+    content = statistic.get_full_info
+    upload_to_yadick(content)
+
+def multitheading():
     runscript = ExcelAllInOne()
-    runscript.main()
+
+    # Создаем экземпляр ThreadPoolExecutor с двумя потоками
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        # Запускаем функции statistic.draw и main_func в фоновом режиме
+        future2 = executor.submit(runscript.main)
+        future1 = executor.submit(main_func)
+
+        # Ожидаем завершение обоих функций
+        future1.result()
+        future2.result()
+
+
+if __name__ == '__main__':
+    multitheading()
+"""
+Добавить загрузку файла настроек:
+пока оттуда нужен яндекс токен
+но файл пусть будет общим для всех программ, просто другие настройки пока
+тут не используются
+"""

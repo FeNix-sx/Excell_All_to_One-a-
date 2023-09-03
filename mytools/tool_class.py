@@ -155,13 +155,13 @@ class CodeNamePhone:
         except Exception as ex:
             print(ex)
             print(f"Не удалось загрузить список смартфоном. Возможно отсутствует файл {filename}")
-            return None
+            return False
 
     def download_models_to_yadisk(self, filename: str)->None:
         try:
             YANDEX_TOKEN = 'y0_AgAAAAABJQnxAAkufQAAAADiFPV_TjOFwUIbR6KNgvJ5KSFpjefPkow'
             yadisk = WorkingYandexDisk(yandex_token=YANDEX_TOKEN)
-            yadisk.download(filename='models.xlsx')
+            yadisk.download_yd(filename='models.xlsx')
 
         except Exception as ex:
             print(ex)
@@ -170,6 +170,8 @@ class CodeNamePhone:
 class NamesPhone:
     def __init__(self):
         self.__phonename = self.__chek_folder_name()
+        if not self.__phonename:
+            raise ConnectionError(f"Не удалось загрузить список смартфоном. Возможно отсутствует файл c моделями с яндекс-диска!")
 
     def __chek_folder_name(self) -> dict:
         """проверка загрузки файла с моделями models.xlsx"""
@@ -185,9 +187,6 @@ class NamesPhone:
             )
             time.sleep(3)
             return False
-
-    def __chek_folder_name___________________(self)->None:
-        pass
 
     def __rename_folder(self, old_name: str, new_name: str) -> None:
         os.rename(old_name, new_name)
