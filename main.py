@@ -2,7 +2,7 @@ import os
 import time
 import pandas as pd
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 from pandas import DataFrame
 from mytools.tool_class import NamesPhone, ColorInput, ColorPrint
 
@@ -25,6 +25,7 @@ class ExcelAllInOne:
         self.date_end = None
         self.inp_begin = None
         self.inp_end = None
+        self.file_count: int=0
         time.sleep(2)
 
     def get_files_names(self) -> list:
@@ -39,7 +40,7 @@ class ExcelAllInOne:
                     break
                 else:
                     printer("Папка Excel_Files не существует")
-                    printinf("Создайте Excel_Files, поместите в нее файлы *.xlsx")
+                    printinf("Создайте Excel_Files, поместите в нее файлы *.xlsx, которые надо обработать")
 
                     if input("Перезапустить программу?(y/n): ") in ("y", "да"):
                         continue
@@ -48,6 +49,8 @@ class ExcelAllInOne:
 
             file_list = os.listdir(folder_path)
             self.xlsx_files = [file for file in file_list if file.endswith('.xlsx')]
+            # количество обрабатываемых файлов
+            self.file_count = len(self.xlsx_files)
 
             printinf("Обнаружены файлы:\n", *self.xlsx_files)
             return self.xlsx_files
@@ -64,6 +67,7 @@ class ExcelAllInOne:
         return True
 
     def merge_data(self) -> None:
+        """обработка файлов-отчётов *.xlsx"""
         try:
             df_full = DataFrame()
 
@@ -80,6 +84,7 @@ class ExcelAllInOne:
             print(f"Ошибка! {ex}")
 
     def set_date_begin_end(self) -> None:
+        """получение временного диапазона от пользователя"""
         try:
             printw(f"Задайте интересующий временной интервал для выборки данных",
                    f"нижняя граница: {self.data_begin}",
@@ -99,7 +104,8 @@ class ExcelAllInOne:
         except Exception as ex:
             print(f"Ошибка! {ex}")
 
-    def transformation_dataframe(self):
+    def transformation_dataframe(self)->DataFrame:
+        """обработка загруженных данных"""
         try:
             # заменяем текстовое поле обоснование на поля с int
             df_dummies = pd.get_dummies(self.df_full["обоснование"], dtype=int)
@@ -273,10 +279,7 @@ class ExcelAllInOne:
             print(ex)
 
     def write_to_excel(self) -> None:
-        """
-        Запись данных в Excel-файл
-        :return:
-        """
+        """ Запись данных в Excel-файл """
         try:
             GROUP_LIST = [
                 'артикул',

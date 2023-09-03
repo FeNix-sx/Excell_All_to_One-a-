@@ -8,6 +8,7 @@ from yadisk import YaDisk
 from datetime import datetime
 from mytools.tool_class import ColorPrint
 from mytools.colletion_stat import StatisticCollection
+from mytools.working_to_yadisk import WorkingYandexDisk
 
 printer = ColorPrint().print_error
 printinf = ColorPrint().print_info
@@ -38,44 +39,12 @@ def upload_to_yadick(content: dict)->None:
 
     try:
         folder_name = content['IP']
-        yadisk = YaDisk(token=YANDEX_TOKEN)
+        yadisk = WorkingYandexDisk(yandex_token=YANDEX_TOKEN)
 
-        # if not yadisk.check_token():
-        #     print("Неверный токен доступа")
-        #     exit()
-
-        if yadisk.check_token():
-            # print("Connection to YD")
-            pass
-        else:
-            # print(f"Ошибка!\nНе удалось подключиться к яндекс-диску.")
-            return
-
-        path_name = ""
-        # создаем папку на яндекс-диске, если ее там нет
-        if FOLDER_PATH != "":
-            if not yadisk.is_dir(f"{FOLDER_PATH}"):
-                yadisk.mkdir(f"{FOLDER_PATH}")
-            else:
-                if not yadisk.is_dir(f"{FOLDER_PATH}/{folder_name}/"):
-                    yadisk.mkdir(f"{FOLDER_PATH}/{folder_name}/")
-
-            path_name = f"{FOLDER_PATH}/{folder_name}/"
-        else:
-            if not yadisk.is_dir(f"{folder_name}/"):
-                yadisk.mkdir(f"{folder_name}/")
-                path_name = f"{folder_name}/"
-
-    except Exception as ex:
-        printer(ex)
-        return
-
-    try:
         # имя файла, равно текущему времени на ПК
         now = datetime.now()
         content['time_start'] = f'{now.strftime("%Y.%m.%d_%H:%M:%S")}'
         filename = f'{now.strftime("%Y.%m.%d_%H.%M.%S")}.pickle'
-        destination_path = f"{path_name + filename}"
 
         # # Открытие файла для записи
         # with open(filename, "w", encoding="utf-8", newline="") as json_file:
@@ -86,7 +55,7 @@ def upload_to_yadick(content: dict)->None:
         with open(filename, "wb") as file:
             pickle.dump(content, file)
 
-        yadisk.upload(filename, destination_path, overwrite=True)
+        yadisk.upload(filename, destination_path)
         os.remove(filename)
 
     except Exception as ex:

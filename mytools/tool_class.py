@@ -7,6 +7,9 @@ import openpyxl
 from datetime import datetime
 from pandas import Series
 from colorama import init, Fore, Style
+
+from mytools.working_to_yadisk import WorkingYandexDisk
+
 init(autoreset=True)
 
 class ColorInput:
@@ -76,9 +79,12 @@ class ColorPrint:
 
 
 class CodeNamePhone:
-    """принимает имя файла csv, из которого потом может прочитать значения"""
+    """принимает имя файла *.xlsx, из которого потом может прочитать значения"""
     def __init__(self, filename):
         self.__filename = self.__chek_name(filename)
+
+    def upload_models(self):
+        pass
 
     def __chek_name(self, filename: str) -> str:
         if filename.endswith("models.xlsx"):
@@ -122,12 +128,16 @@ class CodeNamePhone:
     @property
     def get_names_code_xlsx(self)->dict:
         """
-        Читает модели телефона из файла csv и возвращает словарь с ними:
+        Читает модели телефона из файла xlsx и возвращает словарь с ними:
         ключ - название (вместо "/" пробел)
         значение - код из 6 цифр
         :return: dict (ключ: str, значения: list)
         """
         try:
+            # загрузка файла моделей с яндекса
+            filename = 'models.xlsx'
+            self.download_models_to_yadisk(filename=filename)
+            # обработка файла моделей
             workbook = openpyxl.load_workbook(self.__filename)
             sheet = workbook.active
             models = {}
@@ -139,12 +149,22 @@ class CodeNamePhone:
                 if key:
                     models[key] = value
 
+            os.remove(filename)
             return models
 
         except Exception as ex:
             print(ex)
-            print("Не удалось загрузить список смартфоном. Возможно отсутствует файл 'models.xlsx'")
+            print(f"Не удалось загрузить список смартфоном. Возможно отсутствует файл {filename}")
             return None
+
+    def download_models_to_yadisk(self, filename: str)->None:
+        try:
+            YANDEX_TOKEN = 'y0_AgAAAAABJQnxAAkufQAAAADiFPV_TjOFwUIbR6KNgvJ5KSFpjefPkow'
+            yadisk = WorkingYandexDisk(yandex_token=YANDEX_TOKEN)
+            yadisk.download(filename='models.xlsx')
+
+        except Exception as ex:
+            print(ex)
 
 
 class NamesPhone:
@@ -166,6 +186,8 @@ class NamesPhone:
             time.sleep(3)
             return False
 
+    def __chek_folder_name___________________(self)->None:
+        pass
 
     def __rename_folder(self, old_name: str, new_name: str) -> None:
         os.rename(old_name, new_name)
