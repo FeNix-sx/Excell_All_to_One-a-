@@ -5,6 +5,7 @@ import pandas as pd
 from concurrent.futures import ThreadPoolExecutor
 from datetime import timedelta
 from pandas import DataFrame
+
 from mytools.tool_class import NamesPhone, ColorInput, ColorPrint
 from mytools.colletion_stat import StatisticCollection
 from mytools.tool_function import upload_to_yadick
@@ -388,7 +389,7 @@ def main_func()->None:
     content = statistic.get_full_info
     upload_to_yadick(content)
 
-def multitheading():
+def multithreading():
     runscript = ExcelAllInOne()
 
     # Создаем экземпляр ThreadPoolExecutor с двумя потоками
@@ -403,7 +404,8 @@ def multitheading():
 
 
 if __name__ == '__main__':
-    multitheading()
+    multithreading()
+
 """
 Добавить загрузку файла настроек:
 пока оттуда нужен яндекс токен
