@@ -13,19 +13,10 @@ def upload_to_yadick(content: dict)->None:
     """
     # загрузка параметров: FOLDER_PATH - папка, в которую сохранится folder_name на яддекс_диске
     # YANDEX_TOKEN - токен яндекс REST API
-    while True:
-        try:
-            # FOLDER_PATH = 'STATISTIC'
-            YANDEX_TOKEN = 'y0_AgAAAAABJQnxAAkufQAAAADiFPV_TjOFwUIbR6KNgvJ5KSFpjefPkow'
-
-            if YANDEX_TOKEN == "":
-                raise ValueError
-            break
-
-        except Exception as ex:
-            print(ex)
 
     try:
+        # токен МОЕГО ЯД
+        YANDEX_TOKEN = 'y0_AgAAAAABJQnxAAkufQAAAADiFPV_TjOFwUIbR6KNgvJ5KSFpjefPkow'
         folder_name = content['IP']
         yadisk = WorkingYandexDisk(yandex_token=YANDEX_TOKEN)
 
@@ -34,18 +25,15 @@ def upload_to_yadick(content: dict)->None:
         content['time_start'] = f'{now.strftime("%Y.%m.%d_%H:%M:%S")}'
         filename = f'{now.strftime("%Y.%m.%d_%H.%M.%S")}.pickle'
 
-        # # Открытие файла для записи
-        # with open(filename, "w", encoding="utf-8", newline="") as json_file:
-        #     # Сохранение словаря в JSON файл
-        #     json.dump(content, json_file, indent=4)
-
         # Сохранение словаря в бинарном файле
         with open(filename, "wb") as file:
             pickle.dump(content, file)
 
-        yadisk.upload_yd(
-            folder_name=folder_name,
-            filename=filename
+        folder_path = 'STATISTIC'
+        yadisk.upload_of_yd(
+            folder_name=folder_name,    # имя подкаталога
+            filename=filename,          # имя загружаемого файла
+            folder_path=folder_path     # название основной папки
         )
         os.remove(filename)
 

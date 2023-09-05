@@ -9,6 +9,7 @@ from pandas import Series
 from colorama import init, Fore, Style
 
 from mytools.working_to_yadisk import WorkingYandexDisk
+from mytools.setting import setting
 
 init(autoreset=True)
 
@@ -83,8 +84,8 @@ class CodeNamePhone:
     def __init__(self, filename):
         self.__filename = self.__chek_name(filename)
 
-    def upload_models(self):
-        pass
+        # self.token = setting.token
+        self.token = 'y0_AgAAAAABJQnxAAkufQAAAADiFPV_TjOFwUIbR6KNgvJ5KSFpjefPkow'
 
     def __chek_name(self, filename: str) -> str:
         if filename.endswith("models.xlsx"):
@@ -113,11 +114,9 @@ class CodeNamePhone:
                     if count > 0:
                         # запись в словарь имен из файла с моделями
                         name_code_dict[row[0]] = row[1].replace("/", " ")
-
                     count += 1
 
                 print(f'Найдено моделей телефонов: {count}.')
-
                 return name_code_dict
 
         except Exception as ex:
@@ -135,8 +134,7 @@ class CodeNamePhone:
         """
         try:
             # загрузка файла моделей с яндекса
-            filename = 'models.xlsx'
-            self.download_models_to_yadisk(filename=filename)
+            self.download_models_to_yadisk(filename=self.__filename)
             # обработка файла моделей
             workbook = openpyxl.load_workbook(self.__filename)
             sheet = workbook.active
@@ -149,19 +147,18 @@ class CodeNamePhone:
                 if key:
                     models[key] = value
 
-            os.remove(filename)
+            os.remove(self.__filename)
             return models
 
         except Exception as ex:
             print(ex)
-            print(f"Не удалось загрузить список смартфоном. Возможно отсутствует файл {filename}")
+            print(f"Не удалось загрузить список смартфоном. Возможно отсутствует файл {self.__filename}")
             return False
 
     def download_models_to_yadisk(self, filename: str)->None:
         try:
-            YANDEX_TOKEN = 'y0_AgAAAAABJQnxAAkufQAAAADiFPV_TjOFwUIbR6KNgvJ5KSFpjefPkow'
-            yadisk = WorkingYandexDisk(yandex_token=YANDEX_TOKEN)
-            yadisk.download_yd(filename='models.xlsx')
+            yadisk = WorkingYandexDisk(yandex_token=self.token)
+            yadisk.download_to_yd()
 
         except Exception as ex:
             print(ex)
@@ -169,14 +166,16 @@ class CodeNamePhone:
 
 class NamesPhone:
     def __init__(self):
-        self.__phonename = self.__chek_folder_name()
+        self.__phonename: dict=self.__chek_folder_name()
         if not self.__phonename:
             raise ConnectionError(f"Не удалось загрузить список смартфоном. Возможно отсутствует файл c моделями с яндекс-диска!")
 
     def __chek_folder_name(self) -> dict:
         """проверка загрузки файла с моделями models.xlsx"""
         try:
-            names_codes_dict: dict = CodeNamePhone("models.xlsx").get_names_code_xlsx
+            # название файла берется из файла с настройками
+            file_models = setting.models
+            names_codes_dict: dict=CodeNamePhone(file_models).get_names_code_xlsx
             return names_codes_dict
 
         except ValueError:
@@ -188,20 +187,22 @@ class NamesPhone:
             time.sleep(3)
             return False
 
-    def __rename_folder(self, old_name: str, new_name: str) -> None:
+    def __rename_folder(self, old_name: str, new_name: str)->None:
         os.rename(old_name, new_name)
 
-    def __find_name(self, item):
+    def __find_name(self, item: str)->str:
+        """ ищет соответсвие кода телефона его названию"""
         item = item.split("d")[0]
+
         for key, value in self.__phonename.items():
             if item in value:
                 return key
 
-    def get_names_phone(self, series: Series) -> Series:
+    def get_series_names_phone(self, series: Series)->Series:
         """
-        Получает pandas Series из кодов телефонов, и возвращает Series из названий телефонов
-        :param series:
-        :return:
+        Получает pandas.Series из кодов телефонов, и возвращает Series из названий телефонов
+        :param series: Series из кодов телефонов
+        :return: Series
         """
         try:
             result = Series(self.__find_name(item) for item in series)
@@ -214,7 +215,7 @@ class NamesPhone:
         return result
 
     @staticmethod
-    def __split_text(string: str):
+    def __split_text(string: str)->str:
         try:
             if " с принтом " in string:
                 return string.split(" с принтом ")[1]
@@ -226,5 +227,5 @@ class NamesPhone:
             print(f"Ошибка! {ex}")
 
     @property
-    def get_code_name(self) -> str:
+    def get_phonename(self) -> dict:
         return self.__phonename

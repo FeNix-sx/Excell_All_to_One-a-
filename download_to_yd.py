@@ -26,7 +26,6 @@ def upload_to_yadick(content: dict)->None:
     # YANDEX_TOKEN - токен яндекс REST API
     while True:
         try:
-            FOLDER_PATH = 'STATISTIC'
             YANDEX_TOKEN = 'y0_AgAAAAABJQnxAAkufQAAAADiFPV_TjOFwUIbR6KNgvJ5KSFpjefPkow'
 
             if YANDEX_TOKEN == "":
@@ -54,7 +53,7 @@ def upload_to_yadick(content: dict)->None:
         with open(filename, "wb") as file:
             pickle.dump(content, file)
 
-        yadisk.upload_yd(
+        yadisk.upload_of_yd(
             folder_name=folder_name,
             filename=filename
         )

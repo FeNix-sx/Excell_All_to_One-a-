@@ -6,9 +6,10 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import timedelta
 from pandas import DataFrame
 
-from mytools.tool_class import NamesPhone, ColorInput, ColorPrint
-from mytools.colletion_stat import StatisticCollection
-from mytools.tool_function import upload_to_yadick
+from mytools import NamesPhone, ColorInput, ColorPrint
+from mytools import StatisticCollection
+from mytools import upload_to_yadick
+from mytools import Setting
 
 
 printer = ColorPrint().print_error
@@ -186,7 +187,7 @@ class ExcelAllInOne:
 
             df_source.insert(loc=1, column="Телефон", value="")
             # test1 = change_series.get_names_phone(df_source["Артикул поставщика"])
-            df_source["телефон"] = change_series.get_names_phone(df_source["Артикул поставщика"])
+            df_source["телефон"] = change_series.get_series_names_phone(df_source["Артикул поставщика"])
             # test2 = df_source["Артикул поставщика"].str[-3:]
             df_source["Название"] = df_source["Артикул поставщика"].str[-3:]
             # test3 = df_source["Артикул поставщика"]
@@ -407,8 +408,5 @@ if __name__ == '__main__':
     multithreading()
 
 """
-Добавить загрузку файла настроек:
-пока оттуда нужен яндекс токен
-но файл пусть будет общим для всех программ, просто другие настройки пока
-тут не используются
+
 """
