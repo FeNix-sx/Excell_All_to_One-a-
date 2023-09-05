@@ -2,6 +2,7 @@ from yadisk import YaDisk
 from mytools.setting import setting
 
 class WorkingYandexDisk:
+    # YANDEX_TOKEN = "y0_AgAAAAABJQnxAAkufQAAAADiFPV_TjOFwUIbR6KNgvJ5KSFpjefPkow"  #мой токен
     def __init__(self, yandex_token):
         try:
             self.yadisk = YaDisk(token=yandex_token)

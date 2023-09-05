@@ -16,8 +16,8 @@ printer = ColorPrint().print_error
 printinf = ColorPrint().print_info
 printw = ColorPrint().print_warning
 
-printw("version 1.6.1 (03.09.2023)")
-
+printw("version 1.6.1 (05.09.2023)")
+# ПЕРЕД ОТПРАВКОЙ ПРОВЕРИТЬ ФАЙЛ setting.snv и удалить свой токен !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 change_series = NamesPhone()
 FILTER_RES = ["Продажа", "Логистика", "Возврат"]
 
