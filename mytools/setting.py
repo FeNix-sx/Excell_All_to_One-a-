@@ -7,6 +7,9 @@ class Setting:
         try:
             dotenv_path = 'setting.env'
 
+            if not os.path.isfile(dotenv_path):
+                raise (f"Файл {dotenv_path} не найден!.")
+
             if os.path.exists(dotenv_path):
                 load_dotenv(dotenv_path)
 

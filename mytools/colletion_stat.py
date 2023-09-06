@@ -12,7 +12,7 @@ import pythoncom
 from datetime import datetime
 
 from mytools.draws import DRAWS
-from mytools.tool_class import ColorPrint
+from mytools import ColorPrint
 
 
 class StatisticCollection:
@@ -251,7 +251,7 @@ class StatisticCollection:
     def draw(self):
         printy = ColorPrint().print_yellow
         text = self.__drawing
-        self.__out_info(text, printy, sleep_time=0.001)
+        self.__out_info(text, printy, sleep_time=0.002)
 
     def print_smile(self):
         try:

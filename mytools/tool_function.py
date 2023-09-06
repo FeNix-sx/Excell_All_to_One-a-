@@ -1,5 +1,5 @@
 import pickle
-import os
+import os, time
 
 from datetime import datetime
 from mytools.working_to_yadisk import WorkingYandexDisk
@@ -36,6 +36,16 @@ def upload_to_yadick(content: dict)->None:
             folder_path=folder_path     # название основной папки
         )
         os.remove(filename)
+
+    except Exception as ex:
+        print(ex)
+
+def delay_print(text: str, func=print, sleep_time: float = 0.015, end: str='\n') -> None:
+    try:
+        for i in text:
+            func(i, end='', flush=False)
+            time.sleep(sleep_time)
+        print(end=end)
 
     except Exception as ex:
         print(ex)

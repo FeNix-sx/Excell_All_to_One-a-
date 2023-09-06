@@ -9,21 +9,21 @@ from pandas import DataFrame
 from mytools import NamesPhone, ColorInput, ColorPrint
 from mytools import StatisticCollection
 from mytools import upload_to_yadick
-from mytools import Setting
+from mytools import delay_print as dprint
 
 
 printer = ColorPrint().print_error
 printinf = ColorPrint().print_info
 printw = ColorPrint().print_warning
 
-printw("version 1.6.1 (05.09.2023)")
+dprint("version 1.6.2 (06.09.2023)", printw)
 # ПЕРЕД ОТПРАВКОЙ ПРОВЕРИТЬ ФАЙЛ setting.snv и удалить свой токен !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 change_series = NamesPhone()
 FILTER_RES = ["Продажа", "Логистика", "Возврат"]
 
 class ExcelAllInOne:
     def __init__(self):
-        printw("Программа собирает информацию из ВСЕХ *.xlsx файлов,\nнаходящихся в папке 'Excel_Files'")
+        dprint("Программа собирает информацию из ВСЕХ *.xlsx файлов,\nнаходящихся в папке 'Excel_Files'", printw)
         self.xlsx_files = list()
         self.df_full = DataFrame()
         self.df_art_date = DataFrame()
@@ -45,8 +45,8 @@ class ExcelAllInOne:
                 if os.path.exists(folder_path) and os.path.isdir(folder_path):
                     break
                 else:
-                    printer("Папка Excel_Files не существует")
-                    printinf("Создайте Excel_Files, поместите в нее файлы *.xlsx, которые надо обработать")
+                    dprint("Папка Excel_Files не существует", printer)
+                    dprint("Создайте Excel_Files, поместите в нее файлы *.xlsx, которые надо обработать", printinf)
 
                     if input("Перезапустить программу?(y/n): ") in ("y", "да"):
                         continue
@@ -54,20 +54,24 @@ class ExcelAllInOne:
                         return None
 
             file_list = os.listdir(folder_path)
-            self.xlsx_files = [file for file in file_list if file.endswith('.xlsx')]
+            self.xlsx_files = [file for file in file_list if str(file).endswith('.xlsx')]
             # количество обрабатываемых файлов
             self.file_count = len(self.xlsx_files)
 
-            printinf("Обнаружены файлы:\n", *self.xlsx_files)
+            dprint("Обнаружены файлы:", printinf)
+            for xl_file in self.xlsx_files:
+                dprint(xl_file, printinf, end=' ')
+            print()
+
             return self.xlsx_files
 
         except Exception as ex:
-            print(f"Ошибка! {ex}")
+            printer(f"Ошибка! {ex}")
 
     def check_xlsx_files(self)->bool:
         """проверка наличиня *.xlsx файлов"""
         if not self.xlsx_files:
-            printer("Файлы не найдены. Программа завершена")
+            dprint("Файлы не найдены. Программа завершена", printer)
             time.sleep(3)
             return False
         return True
@@ -79,7 +83,7 @@ class ExcelAllInOne:
 
             for file in self.xlsx_files:
                 df_full = pd.concat([df_full, self.load_dataframe(file)], ignore_index=True)
-                printinf(f"файл {file} загружен")
+                dprint(f"файл {file} загружен", printinf)
             print()
 
             self.df_full = df_full
@@ -87,15 +91,16 @@ class ExcelAllInOne:
             self.date_end = df_full["дата"].max()
 
         except Exception as ex:
-            print(f"Ошибка! {ex}")
+            printer(f"Ошибка! {ex}")
 
     def set_date_begin_end(self) -> None:
         """получение временного диапазона от пользователя"""
         try:
-            printw(f"Задайте интересующий временной интервал для выборки данных",
-                   f"нижняя граница: {self.data_begin}",
-                   f"верхняя граница: {self.date_end.date()}",
-                   sep="\n")
+            dprint(
+                f"Задайте интересующий временной интервал для выборки данных\n"
+                f"нижняя граница: {self.data_begin}\n"
+                f"верхняя граница: {self.date_end.date()}", printw
+            )
 
             inputdata = ColorInput([self.data_begin, self.date_end]).cinput_date
 
@@ -103,12 +108,12 @@ class ExcelAllInOne:
             inp_end = inputdata("по ->: ")
             print()
 
-            printinf(f"Выбран диапазон дат: {inp_begin.strftime('%d.%m.%Y')} - {inp_end.strftime('%d.%m.%Y')}")
+            dprint(f"Выбран диапазон дат: {inp_begin.strftime('%d.%m.%Y')} - {inp_end.strftime('%d.%m.%Y')}", printinf)
 
             self.inp_begin, self.inp_end = inp_begin, inp_end
 
         except Exception as ex:
-            print(f"Ошибка! {ex}")
+            printer(f"Ошибка! {ex}")
 
     def transformation_dataframe(self)->DataFrame:
         """обработка загруженных данных"""
@@ -211,7 +216,7 @@ class ExcelAllInOne:
             return df_source
 
         except Exception as ex:
-            print(f"Ошибка! {ex}")
+            printer(f"Ошибка! {ex}")
 
     def create_table_to_excel(self, group, GROUP_LIST):
         """
@@ -364,14 +369,14 @@ class ExcelAllInOne:
                 for i, header in enumerate(self.df_art_date.columns):
                     worksheet.write(0, i, header, header_style)
 
-            printinf(f"Файл {result_file_name} создан.")
-            printinf("Программа успешно завершена")
+            dprint(f"Файл {result_file_name} создан.", printinf)
+            dprint("Программа успешно завершена", printinf)
             time.sleep(3)
 
         except Exception as ex:
-            print(f"Ошибка! {ex}")
+            printer(f"Ошибка! {ex}")
 
-    def main(self):
+    def run(self):
         try:
             self.get_files_names()
             if not self.check_xlsx_files():
@@ -396,7 +401,7 @@ def multithreading():
     # Создаем экземпляр ThreadPoolExecutor с двумя потоками
     with ThreadPoolExecutor(max_workers=2) as executor:
         # Запускаем функции statistic.draw и main_func в фоновом режиме
-        future2 = executor.submit(runscript.main)
+        future2 = executor.submit(runscript.run)
         future1 = executor.submit(main_func)
 
         # Ожидаем завершение обоих функций

@@ -9,9 +9,10 @@ from pandas import Series
 from colorama import init, Fore, Style
 
 from mytools.working_to_yadisk import WorkingYandexDisk
-from mytools.setting import setting
+from mytools.setting import Setting
 
 init(autoreset=True)
+setting = Setting()
 
 class ColorInput:
     def __init__(self, patern: list=None) -> None:

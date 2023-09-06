@@ -1,13 +1,13 @@
 import time
-import json
 import os
 import pickle
 
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
-from mytools.tool_class import ColorPrint
-from mytools.colletion_stat import StatisticCollection
-from mytools.working_to_yadisk import WorkingYandexDisk
+from mytools import ColorPrint
+from mytools import StatisticCollection
+from mytools import WorkingYandexDisk
+from mytools import delay_print
 
 printer = ColorPrint().print_error
 printinf = ColorPrint().print_info
@@ -44,11 +44,6 @@ def upload_to_yadick(content: dict)->None:
         content['time_start'] = f'{now.strftime("%Y.%m.%d_%H:%M:%S")}'
         filename = f'{now.strftime("%Y.%m.%d_%H.%M.%S")}.pickle'
 
-        # # Открытие файла для записи
-        # with open(filename, "w", encoding="utf-8", newline="") as json_file:
-        #     # Сохранение словаря в JSON файл
-        #     json.dump(content, json_file, indent=4)
-
         # Сохранение словаря в бинарном файле
         with open(filename, "wb") as file:
             pickle.dump(content, file)
@@ -69,9 +64,17 @@ def main_func()->None:
 
 
 def main_multiprocessing():
-    printw("version 1.2.2 (02.09.2023)")
-    printw("Программа для сбора информации об интернет соединении")
-    printinf('Благодарю за использование программы!')
+    text = [
+        "version 1.2.3 (06.09.2023)",
+        "Программа собирает информацию об интернет соединении",
+        "Благодарю за использование программы!"
+    ]
+    for item in text:
+        delay_print(
+            text=item,
+            func=printw,
+            sleep_time= 0.015
+        )
     # Создаем экземпляр ThreadPoolExecutor с двумя потоками
     with ThreadPoolExecutor(max_workers=2) as executor:
         # Запускаем функции statistic.draw и main_func в фоновом режиме
@@ -85,6 +88,10 @@ def main_multiprocessing():
 
 if __name__ == '__main__':
     main_multiprocessing()
-    printw('Каждый запуск помогает мне в обучении')
+    delay_print(
+        text='Каждый запуск помогает мне в обучении',
+        func=printw,
+        sleep_time=0.015
+    )
     statistic.print_smile()
     time.sleep(3)
