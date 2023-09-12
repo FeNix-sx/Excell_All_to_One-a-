@@ -4,7 +4,7 @@ import os, time
 from datetime import datetime
 from mytools.working_to_yadisk import WorkingYandexDisk
 
-def upload_to_yadick(content: dict)->None:
+def upload_to_my_yadick(content: dict)->None:
     """
     Загружает на яндекс диск в папку folder_name(ip-адрес пользователя)
     статистику по работе программы:

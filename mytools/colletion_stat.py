@@ -20,6 +20,9 @@ class StatisticCollection:
         self.__collection_dict = dict()
         self.__drawing = random.choice(DRAWS)
 
+    def get_version(self, program, version):
+        self.__collection_dict[program] = version
+
     @staticmethod
     def __out_error(error_srt: str )->None:
         print(error_srt)

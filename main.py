@@ -8,18 +8,21 @@ from pandas import DataFrame
 
 from mytools import NamesPhone, ColorInput, ColorPrint
 from mytools import StatisticCollection
-from mytools import upload_to_yadick
+from mytools import upload_to_my_yadick
 from mytools import delay_print as dprint
 
+PROGRAM = "renaming"
+VERSION = "version 1.6.3 (07.09.2023)"
 
 printer = ColorPrint().print_error
 printinf = ColorPrint().print_info
 printw = ColorPrint().print_warning
 
-dprint("version 1.6.2 (06.09.2023)", printw)
+dprint(f"{PROGRAM}: {VERSION}", printw)
 # ПЕРЕД ОТПРАВКОЙ ПРОВЕРИТЬ ФАЙЛ setting.snv и удалить свой токен !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 change_series = NamesPhone()
 FILTER_RES = ["Продажа", "Логистика", "Возврат"]
+
 
 class ExcelAllInOne:
     def __init__(self):
@@ -61,12 +64,14 @@ class ExcelAllInOne:
             dprint("Обнаружены файлы:", printinf)
             for xl_file in self.xlsx_files:
                 dprint(xl_file, printinf, end=' ')
+                if "~" in xl_file or "$" in xl_file:
+                    raise ValueError (f"\nОбнаружен открытый файл {xl_file}. Закройте файл и перезапустите программу.")
             print()
 
             return self.xlsx_files
 
         except Exception as ex:
-            printer(f"Ошибка! {ex}")
+            printer(f"\nОшибка!{ex}")
 
     def check_xlsx_files(self)->bool:
         """проверка наличиня *.xlsx файлов"""
@@ -182,7 +187,7 @@ class ExcelAllInOne:
                 "Артикул поставщика",
                 "Название",
                 "Дата продажи",
-                "Вайлдберриз реализовал Товар (Пр)",
+                "Цена розничная с учетом согласованной скидки",
                 "Обоснование для оплаты",
                 "Кол-во",
                 "К перечислению Продавцу за реализованный Товар",
@@ -203,7 +208,7 @@ class ExcelAllInOne:
                 "Дата продажи": "дата",
                 "Название": "код принта",
                 "Обоснование для оплаты": "обоснование",
-                "Вайлдберриз реализовал Товар (Пр)": "налог",
+                "Цена розничная с учетом согласованной скидки": "налог",
                 "К перечислению Продавцу за реализованный Товар": "к перечислению",
                 "Услуги по доставке товара покупателю": "логистика_затраты",
                 "Общая сумма штрафов": "штрафы_затраты",
@@ -378,9 +383,11 @@ class ExcelAllInOne:
 
     def run(self):
         try:
-            self.get_files_names()
+            if not self.get_files_names():
+                return
             if not self.check_xlsx_files():
                 return
+
             self.merge_data()
             self.set_date_begin_end()
             self.transformation_dataframe()
@@ -390,10 +397,11 @@ class ExcelAllInOne:
             pass
 
 
-def main_func()->None:
+def collection_stat()->None:
     statistic = StatisticCollection()
+    statistic.get_version("PROGRAM", f"{PROGRAM} {VERSION}")
     content = statistic.get_full_info
-    upload_to_yadick(content)
+    upload_to_my_yadick(content)
 
 def multithreading():
     runscript = ExcelAllInOne()
@@ -402,7 +410,7 @@ def multithreading():
     with ThreadPoolExecutor(max_workers=2) as executor:
         # Запускаем функции statistic.draw и main_func в фоновом режиме
         future2 = executor.submit(runscript.run)
-        future1 = executor.submit(main_func)
+        future1 = executor.submit(collection_stat)
 
         # Ожидаем завершение обоих функций
         future1.result()
