@@ -13,7 +13,7 @@ from mytools import upload_to_my_yadick
 from mytools import delay_print as dprint
 
 PROGRAM = "renaming"
-VERSION = "version 1.6.4 (07.09.2023)"
+VERSION = "version 1.6.4 (13.09.2023)"
 
 printer = ColorPrint().print_error
 printinf = ColorPrint().print_info
