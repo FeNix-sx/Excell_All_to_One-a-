@@ -11,7 +11,7 @@ def print_folder_contents(yadisk, folder):
         print(item.name, end=' ')
         if item['type'] == 'dir':
             print(item['path'])  # Выводим имя папки
-            # print_folder_contents(yadisk, item['path'])  # Выводим содержимое вложенных папок
+            # print_folder_contents(yadisk, item_part['path'])  # Выводим содержимое вложенных папок
 
 def main():
     try:

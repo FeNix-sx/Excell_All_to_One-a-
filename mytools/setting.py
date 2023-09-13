@@ -17,6 +17,15 @@ class Setting:
             print(ex)
 
     @property
+    def purchase_amount(self):
+        try:
+            PURCHASE_AMOUNT = os.getenv('PURCHASE_AMOUNT')
+            return float(PURCHASE_AMOUNT)
+
+        except Exception as ex:
+            print(ex)
+
+    @property
     def folder_sett(self)->str:
         try:
             FOLDER_SETT = os.getenv('FOLDER_SETT')

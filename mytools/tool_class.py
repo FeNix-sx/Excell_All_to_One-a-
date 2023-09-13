@@ -192,12 +192,21 @@ class NamesPhone:
         os.rename(old_name, new_name)
 
     def __find_name(self, item: str)->str:
-        """ ищет соответсвие кода телефона его названию"""
-        item = item.split("d")[0]
+        """ищет соответсвие кода телефона его названию"""
+        try:
+            item_part = item.split("d")[0]
 
-        for key, value in self.__phonename.items():
-            if item in value:
-                return key
+            if not item_part:
+                # print(item)
+                return "000000"
+
+            for key, value in self.__phonename.items():
+                if item_part in value:
+                    return key
+
+        except Exception as ex:
+            pass
+            # print(f"Ошибка соответствия кода телефона в отчете: {item}! {ex}")
 
     def get_series_names_phone(self, series: Series)->Series:
         """

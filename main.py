@@ -8,11 +8,12 @@ from pandas import DataFrame
 
 from mytools import NamesPhone, ColorInput, ColorPrint
 from mytools import StatisticCollection
+from mytools import setting
 from mytools import upload_to_my_yadick
 from mytools import delay_print as dprint
 
 PROGRAM = "renaming"
-VERSION = "version 1.6.3 (07.09.2023)"
+VERSION = "version 1.6.4 (07.09.2023)"
 
 printer = ColorPrint().print_error
 printinf = ColorPrint().print_info
@@ -152,7 +153,7 @@ class ExcelAllInOne:
                       df_full["налог"] -
                       df_full["логистика_затраты"] -
                       df_full["штрафы_затраты"] -
-                      df_full["Логистика"] * 157.5
+                      df_full["Логистика"] * setting.purchase_amount
             )
             if 'Штрафы' not in df_full.columns:
                 df_full["Штрафы" ] = 0
