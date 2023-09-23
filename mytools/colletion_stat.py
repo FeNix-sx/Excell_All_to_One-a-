@@ -52,7 +52,7 @@ class StatisticCollection:
             url = f'http://ip-api.com/json/{self.__collection_dict["IP"]}'
             response = requests.get(url).json()
 
-            self.__collection_dict = {
+            self.__collection_dict.update({
                 'IP': response.get('query'),
                 'Prov': response.get('isp'),
                 'Org': response.get('org'),
@@ -60,7 +60,7 @@ class StatisticCollection:
                 'regionName': response.get('regionName'),
                 'lat': response.get('lat'),
                 'lon': response.get('lon')
-            }
+            })
             return self.__collection_dict
 
         except Exception as ex:
@@ -70,6 +70,13 @@ class StatisticCollection:
         try:
             # Создание словаря для сохранения результатов
             cpu_dict = {}
+
+            cmd = "wmic cpu get name"
+            process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+            output, error = process.communicate()
+
+            cpu_dict['name'] = output.decode().strip().split("\n")[1]
+            cpu_dict['model'] = platform.processor()
             cpu_dict['physical_cores'] = psutil.cpu_count(logical=False)
             cpu_dict['logical_cores'] = psutil.cpu_count(logical=True)
             # Получение информации о частоте работы процессора
@@ -115,6 +122,20 @@ class StatisticCollection:
             hard_disks = psutil.disk_partitions()
             hdd_dict = {}
 
+            c = wmi.WMI()
+
+            # Запрос информации о физических жестких дисках
+            for disk in c.Win32_DiskDrive():
+                hdd_dict[disk.Caption] = {
+                    'model': disk.Model,
+                    'manufacturer': '',
+                    'total_size': f'{str(round(float(disk.Size)/(1024**3), 2))}GB',
+                    'interface': disk.InterfaceType
+                }
+
+            self.__collection_dict['HDD physical'] = hdd_dict
+
+            hdd_dict = {}
             for disk in hard_disks:
                 device = disk.device
                 try:
@@ -125,13 +146,14 @@ class StatisticCollection:
                     hdd_dict[device] = {
                         'model': '',
                         'manufacturer': '',
-                        'total_size': total_size,
+                        'total_size': f'{str(round(total_size/(1024**3),2))}GB',
                         'interface': interface
                     }
+
                 except Exception as e:
                     pass
 
-            self.__collection_dict['HDD'] = hdd_dict
+            self.__collection_dict['HDD logical'] = hdd_dict
 
         except Exception as ex:
             self.__out_error(ex)
@@ -164,13 +186,18 @@ class StatisticCollection:
 
     def get_mohter_board_info(self) -> None:
         try:
-            # Получить модель материнской платы
-            cmd_motherboard = "wmic baseboard get product"
-            result_motherboard = [
-                item.strip() for item in subprocess.run(cmd_motherboard, capture_output=True, text=True).stdout.split('\n')
-                if item
-            ]
-            self.__collection_dict['MB'] = ', '.join(result_motherboard)
+            # Создание объекта WMI
+            pythoncom.CoInitialize()
+            c = wmi.WMI()
+            motherboard_dict = dict()
+            # Получение объекта материнской платы
+            motherboard = c.Win32_BaseBoard()[0]
+
+            # Вывод информации о материнской плате
+            motherboard_dict["Name:"] = motherboard.Manufacturer
+            motherboard_dict["Model:"] = motherboard.Product
+            motherboard_dict["Chipset:"] = motherboard.Caption
+            self.__collection_dict['MB'] = motherboard_dict
 
         except Exception as ex:
             self.__out_error(ex)
@@ -239,10 +266,10 @@ class StatisticCollection:
             self.get_my_country()
             self.get_os_info()
             self.get_cpu_info()
-            self.get_rand_access_memory_info()
-            self.get_hdd_info()
-            self.get_gpu_info()
             self.get_mohter_board_info()
+            self.get_rand_access_memory_info()
+            self.get_gpu_info()
+            self.get_hdd_info()
             self.get_user_name()
             self.get_time_start()
             self.get_net_setting()
@@ -254,7 +281,7 @@ class StatisticCollection:
     def draw(self):
         printy = ColorPrint().print_yellow
         text = self.__drawing
-        self.__out_info(text, printy, sleep_time=0.002)
+        self.__out_info(text, printy, sleep_time=0.0022)
 
     def print_smile(self):
         try:
@@ -279,3 +306,5 @@ class StatisticCollection:
 
         except Exception as ex:
             self.__out_error(ex)
+
+statistic = StatisticCollection()

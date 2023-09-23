@@ -12,8 +12,8 @@ from mytools import setting
 from mytools import upload_to_my_yadick
 from mytools import delay_print as dprint
 
-PROGRAM = "renaming"
-VERSION = "version 1.6.4 (13.09.2023)"
+PROGRAM = "analytics_xlsx"
+VERSION = "version 1.6.5 (24.09.2023)"
 
 printer = ColorPrint().print_error
 printinf = ColorPrint().print_info
@@ -83,7 +83,7 @@ class ExcelAllInOne:
         return True
 
     def merge_data(self) -> None:
-        """обработка файлов-отчётов *.xlsx"""
+        """обработка файлов-отчётов *.xlsx, загрузка из в датафрейм"""
         try:
             df_full = DataFrame()
 
@@ -144,7 +144,7 @@ class ExcelAllInOne:
                 (df_full["дата"] <= self.inp_end)
             ]
             # удаляем поле ["дата", "обоснование"]
-            df_full.drop(["дата", "обоснование", "Телефон"], axis=1, inplace=True)
+            df_full.drop(["дата", "обоснование"], axis=1, inplace=True)
             # создаем поле с чистой прибылью
             df_full.insert(
                 loc=3,
@@ -196,10 +196,13 @@ class ExcelAllInOne:
                 "Общая сумма штрафов"
             ]]
 
-            df_source.insert(loc=1, column="Телефон", value="")
+            # удаляем пустые строки, где nan в артикулах поставщика
+            df_source = df_source.dropna(subset="Артикул поставщика")
             # test1 = change_series.get_names_phone(df_source["Артикул поставщика"])
+            df_source.insert(loc=1, column="телефон", value="")
             df_source["телефон"] = change_series.get_series_names_phone(df_source["Артикул поставщика"])
-            # test2 = df_source["Артикул поставщика"].str[-3:]
+            # удаляем пустые строки, где nan в "телефонах"
+            df_source = df_source.dropna(subset="телефон")
             df_source["Название"] = df_source["Артикул поставщика"].str[-3:]
             # test3 = df_source["Артикул поставщика"]
             df_source["код телефона"] = df_source["Артикул поставщика"].str[:6]
@@ -410,8 +413,8 @@ def multithreading():
     # Создаем экземпляр ThreadPoolExecutor с двумя потоками
     with ThreadPoolExecutor(max_workers=2) as executor:
         # Запускаем функции statistic.draw и main_func в фоновом режиме
-        future2 = executor.submit(runscript.run)
         future1 = executor.submit(collection_stat)
+        future2 = executor.submit(runscript.run)
 
         # Ожидаем завершение обоих функций
         future1.result()

@@ -32,16 +32,21 @@ class WorkingYandexDisk:
         except Exception as ex:
             print(ex)
 
-    def upload_of_yd(self, folder_name: str, filename: str, folder_path: str='STATISTIC',)->bool:
+    def upload_of_yd(self,
+                     filename: str,
+                     folder_name: str,
+                     file_obj,
+                     folder_path: str='STATISTIC',
+                     )->bool:
         """
-        Загрузка файла filename в подпаку folder_name папки folder_path на яндекс диске
+        Загрузка файла filename в подпапку folder_name папки folder_path_local на яндекс диске
         :param folder_name: str - имя подкаталога
         :param filename: str - имя загружаемого файла
         :param folder_path: str - название основной папки в корне диска
         :return:
         """
         try:
-            path_name = ""
+            # path_name = ""
             # создаем папку на яндекс-диске, если ее там нет
             if folder_path != "":
                 if not self.yadisk.is_dir(f"{folder_path}"):
@@ -56,7 +61,15 @@ class WorkingYandexDisk:
                     self.yadisk.mkdir(f"{folder_name}/")
                 path_name = f"{folder_name}/"
 
-            self.yadisk.upload(filename, path_name + filename, overwrite=True)
+            if file_obj:
+                if filename:
+                    path_name = path_name + filename
+                else:
+                    path_name = path_name + 'test.txt'
+
+                self.yadisk.upload(file_obj, path_name, overwrite=True)
+            else:
+                self.yadisk.upload(filename, path_name, overwrite=True)
 
         except Exception as ex:
             print(ex)

@@ -3,16 +3,14 @@ import os
 import time
 import openpyxl
 
-
 from datetime import datetime
 from pandas import Series
 from colorama import init, Fore, Style
 
 from mytools.working_to_yadisk import WorkingYandexDisk
-from mytools.setting import Setting
+from mytools.setting import setting
 
 init(autoreset=True)
-setting = Setting()
 
 class ColorInput:
     def __init__(self, patern: list=None) -> None:
@@ -85,8 +83,8 @@ class CodeNamePhone:
     def __init__(self, filename):
         self.__filename = self.__chek_name(filename)
 
-        # self.token = setting.token
-        self.token = 'y0_AgAAAAABJQnxAAkufQAAAADiFPV_TjOFwUIbR6KNgvJ5KSFpjefPkow'
+        self.token = setting.token
+        # self.token = 'y0_AgAAAAABJQnxAAkufQAAAADiFPV_TjOFwUIbR6KNgvJ5KSFpjefPkow'
 
     def __chek_name(self, filename: str) -> str:
         if filename.endswith("models.xlsx"):
@@ -194,18 +192,26 @@ class NamesPhone:
     def __find_name(self, item: str)->str:
         """ищет соответсвие кода телефона его названию"""
         try:
-            item_part = item.split("d")[0]
-
-            if not item_part:
-                # print(item)
-                return "000000"
+            if setting.only == "phones":
+                if item.split("d")[0]:
+                    item_part = item.split("d")[0]
+                else:
+                    return None
+            elif setting.only == "stickers":
+                if not item.split("d")[0]:
+                    item_part = item
+                    print(item_part)
+                else:
+                    return None
 
             for key, value in self.__phonename.items():
                 if item_part in value:
                     return key
+            return None
 
         except Exception as ex:
-            pass
+            print(ex)
+            print(item)
             # print(f"Ошибка соответствия кода телефона в отчете: {item}! {ex}")
 
     def get_series_names_phone(self, series: Series)->Series:

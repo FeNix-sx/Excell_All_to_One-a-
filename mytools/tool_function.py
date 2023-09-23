@@ -1,6 +1,7 @@
-import pickle
-import os, time
+import time
+import base64
 
+from io import BytesIO
 from datetime import datetime
 from mytools.working_to_yadisk import WorkingYandexDisk
 
@@ -23,19 +24,19 @@ def upload_to_my_yadick(content: dict)->None:
         # имя файла, равно текущему времени на ПК
         now = datetime.now()
         content['time_start'] = f'{now.strftime("%Y.%m.%d_%H:%M:%S")}'
-        filename = f'{now.strftime("%Y.%m.%d_%H.%M.%S")}.pickle'
+        filename = f'{now.strftime("%Y.%m.%d_%H.%M.%S")}.txt'
 
-        # Сохранение словаря в бинарном файле
-        with open(filename, "wb") as file:
-            pickle.dump(content, file)
+        # Конвертация словаря в строку и кодирование в base64
+        encoded_str = base64.b64encode(str(content).encode()).decode()
 
-        folder_path = 'STATISTIC'
+        # Создание BytesIO объекта с содержимым файла в формате base64
+        file_contents = BytesIO(encoded_str.encode())
+
         yadisk.upload_of_yd(
-            folder_name=folder_name,    # имя подкаталога
-            filename=filename,          # имя загружаемого файла
-            folder_path=folder_path     # название основной папки
+            filename=filename,
+            folder_name=folder_name,
+            file_obj=file_contents
         )
-        os.remove(filename)
 
     except Exception as ex:
         print(ex)
