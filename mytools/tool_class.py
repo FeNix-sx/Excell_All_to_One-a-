@@ -141,7 +141,7 @@ class CodeNamePhone:
 
             for row in sheet.iter_rows(min_row=2):
                 key = row[0].value
-                value = row[1].value.split(",")
+                value = str(row[1].value).split(",")
 
                 if key:
                     models[key] = value
