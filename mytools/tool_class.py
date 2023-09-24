@@ -207,7 +207,7 @@ class NamesPhone:
             for key, value in self.__phonename.items():
                 if item_part in value:
                     return key
-            return None
+            return f"UNKNOWN_CODE ●●● {item_part} ●●●"
 
         except Exception as ex:
             print(ex)

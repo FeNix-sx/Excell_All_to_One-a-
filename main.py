@@ -20,7 +20,7 @@ printinf = ColorPrint().print_info
 printw = ColorPrint().print_warning
 
 dprint(f"{PROGRAM}: {VERSION}", printw)
-# ПЕРЕД ОТПРАВКОЙ ПРОВЕРИТЬ ФАЙЛ setting.snv и удалить свой токен !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# ПЕРЕД ОТПРАВКОЙ ПРОВЕРИТЬ ФАЙЛ setting.env и удалить свой токен !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 change_series = NamesPhone()
 FILTER_RES = ["Продажа", "Логистика", "Возврат"]
 
